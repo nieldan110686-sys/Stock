@@ -3,237 +3,676 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- GANTI JUDUL HALAMAN DI SINI (Muncul di Tab Browser) -->
-    <title>Galeri Foto Produk Unggulan</title>
-
-    <!-- Menghubungkan ke Google Fonts untuk tulisan yang lebih menarik -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
+    <title>Koleksi Produk Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- GAYA UMUM HALAMAN --- */
         :root {
-            --warna-utama: #2c3e50; /* Abu-abu Gelap */
-            --warna-aksen: #3498db;   /* Biru Menarik */
-            --warna-harga: #27ae60;   /* Hijau untuk Harga */
-            --warna-latar: #f8f9fa;   /* Latar Belakang Abu-abu Muda */
-            --warna-teks: #333;       /* Warna Teks Utama */
-            --warna-teks-ringan: #777;/* Warna Teks Deskripsi */
+            --primary-color: #4a6cf7;
+            --secondary-color: #6c63ff;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--warna-latar);
-            color: var(--warna-teks);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-color);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
-        /* --- GAYA JUDUL UTAMA --- */
         header {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 20px 0;
         }
 
-        /* 
-            === PERHATIAN ===
-            Judul di bawah ini bisa Anda edit langsung dari HTML.
-            Cari teks "Judul Galeri Foto Saya" dan ganti dengan judul yang Anda inginkan.
-        */
-        header h1 {
-            color: var(--warna-utama);
-            font-size: 2.5rem;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
             font-weight: 700;
-            margin: 0;
-            letter-spacing: 1px;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
         }
 
-        header p {
-            color: var(--warna-teks-ringan);
-            font-size: 1.1rem;
-            margin-top: 10px;
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
         }
 
-        /* --- GAYA GRID GALERI FOTO (TABEL PRODUK) --- */
-        .product-grid {
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .hero {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: #666;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .products-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
+            margin-bottom: 60px;
         }
 
-        /* --- GAYA KARTU PRODUK (SETIAP ITEM FOTO) --- */
         .product-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            background: white;
+            border-radius: 15px;
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            animation: fadeIn 0.5s ease;
             display: flex;
             flex-direction: column;
         }
 
         .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
 
-        .product-card img {
+        .product-image {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
             width: 100%;
-            height: 250px;
-            object-fit: cover; /* Memastikan foto terlihat bagus dan proporsional */
-            display: block;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
         .product-info {
             padding: 20px;
-            flex-grow: 1; /* Mendorong konten ke bawah */
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
-        .product-info h3 {
-            font-size: 1.4rem;
+        .product-name {
+            font-size: 1.2rem;
             font-weight: 600;
-            color: var(--warna-utama);
-            margin: 0 0 10px 0;
+            margin-bottom: 10px;
+            color: var(--text-color);
         }
 
-        .product-info .price {
+        .product-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
             font-size: 1.3rem;
             font-weight: 700;
-            color: var(--warna-harga);
-            margin: 0 0 15px 0;
+            color: var(--primary-color);
         }
 
-        .product-info .description {
-            font-size: 0.95rem;
-            color: var(--warna-teks-ringan);
-            margin: 0;
-            flex-grow: 1; /* Membuat deskripsi mengisi ruang kosong */
+        .add-to-cart {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
         }
 
-        /* --- UNTUK TAMPILAN DI HP/LAYAR KECIL --- */
+        .add-to-cart:hover {
+            background: var(--secondary-color);
+        }
+
+        .add-to-cart i {
+            margin-left: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            animation: spin 2s infinite linear;
+        }
+
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
-            header h1 {
+            .hero h1 {
                 font-size: 2rem;
             }
-            .product-grid {
-                grid-template-columns: 1fr; /* Hanya 1 kolom di layar kecil */
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .products-container {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 20px;
             }
         }
     </style>
 </head>
 <body>
-
     <header>
         <div class="container">
-            <!-- =========================================================== -->
-            <!--                  GANTI JUDUL UTAMA DI SINI                  -->
-            <!-- =========================================================== -->
-            <h1>Judul Galeri Foto Saya</h1>
-            <p>Koleksi foto-foto pilihan dengan kualitas terbaik untuk Anda</p>
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <i class="fas fa-store"></i>
+                    Toko Premium
+                </a>
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Cari produk...">
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <main class="container">
-        <div class="product-grid">
-
-            <!-- =========================================================== -->
-            <!--                    AWAL DARI KARTU PRODUK 1                   -->
-            <!-- =========================================================== -->
-            <div class="product-card">
-                <!-- 
-                    === CARA MENGGANTI FOTO ===
-                    1. Simpan foto Anda dalam satu folder yang sama dengan file HTML ini, 
-                       atau dalam folder 'images'.
-                    2. Ganti 'foto-produk-1.jpg' dengan nama file foto Anda.
-                    Contoh: src="images/gunung-fuji.jpg"
-                -->
-                <img src="https://via.placeholder.com/400x250.png?text=Foto+Produk+1" alt="Foto Produk 1">
-
-                <div class="product-info">
-                    <!-- GANTI NAMA PRODUK 1 -->
-                    <h3>Nama Produk 1</h3>
-                    
-                    <!-- GANTI HARGA PRODUK 1 -->
-                    <p class="price">Rp 250.000</p>
-                    
-                    <!-- GANTI DESKRIPSI / CATATAN PRODUK 1 -->
-                    <p class="description">
-                        Foto ini diambil saat golden hour, menampilkan permainan cahaya yang sempurna. 
-                        Sangat cocok untuk hiasan dinding ruang tamu atau kantor. Kualitas cetak high resolution.
-                    </p>
-                </div>
+    <section class="hero">
+        <div class="container">
+            <h1>Koleksi Produk Unggulan</h1>
+            <p>Temukan produk berkualitas tinggi dengan harga terbaik. Koleksi kami dipilih dengan teliti untuk memenuhi kebutuhan Anda.</p>
+            <div class="filter-container">
+                <button class="filter-btn active" data-filter="all">Semua Produk</button>
+                <button class="filter-btn" data-filter="new">Produk Baru</button>
+                <button class="filter-btn" data-filter="sale">Promo</button>
+                <button class="filter-btn" data-filter="popular">Populer</button>
             </div>
-            <!-- =========================================================== -->
-            <!--                    AKHIR DARI KARTU PRODUK 1                   -->
-            <!-- =========================================================== -->
-
-
-
-            <!-- =========================================================== -->
-            <!--                    AWAL DARI KARTU PRODUK 2                   -->
-            <!-- =========================================================== -->
-            <div class="product-card">
-                <img src="https://via.placeholder.com/400x250.png?text=Foto+Produk+2" alt="Foto Produk 2">
-
-                <div class="product-info">
-                    <!-- GANTI NAMA PRODUK 2 -->
-                    <h3>Nama Produk 2</h3>
-                    
-                    <!-- GANTI HARGA PRODUK 2 -->
-                    <p class="price">Rp 350.000</p>
-                    
-                    <!-- GANTI DESKRIPSI / CATATAN PRODUK 2 -->
-                    <p class="description">
-                        Potret makro alam yang memukau. Setiap detail terlihat sangat jelas. 
-                        Catatan: Foto ini hanya tersedia dalam ukuran cetak A3 ke atas.
-                    </p>
-                </div>
-            </div>
-            <!-- =========================================================== -->
-            <!--                    AKHIR DARI KARTU PRODUK 2                   -->
-            <!-- =========================================================== -->
-
-
-
-            <!-- =========================================================== -->
-            <!--                    AWAL DARI KARTU PRODUK 3                   -->
-            <!-- =========================================================== -->
-            <div class="product-card">
-                <img src="https://via.placeholder.com/400x250.png?text=Foto+Produk+3" alt="Foto Produk 3">
-
-                <div class="product-info">
-                    <!-- GANTI NAMA PRODUK 3 -->
-                    <h3>Nama Produk 3</h3>
-                    
-                    <!-- GANTI HARGA PRODUK 3 -->
-                    <p class="price">Rp 150.000</p>
-                    
-                    <!-- GANTI DESKRIPSI / CATATAN PRODUK 3 -->
-                    <p class="description">
-                        Moment langka yang berhasil diabadikan. Foto ini menceritakan sebuah kisah tanpa kata. 
-                        Cocok untuk Anda yang menyukai foto dengan nilai filosofis tinggi.
-                    </p>
-                </div>
-            </div>
-            <!-- =========================================================== -->
-            <!--                    AKHIR DARI KARTU PRODUK 3                   -->
-            <!-- =========================================================== -->
-
         </div>
+    </section>
+
+    <main class="container">
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Sedang memuat produk...</p>
+        </div>
+        <div class="products-container" id="productsContainer"></div>
     </main>
 
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Tentang Kami</h3>
+                    <p>Kami menyediakan produk berkualitas dengan harga terjangkau untuk memenuhi kebutuhan sehari-hari Anda.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Link Cepat</h3>
+                    <ul>
+                        <li><a href="#">Beranda</a></li>
+                        <li><a href="#">Produk</a></li>
+                        <li><a href="#">Promo</a></li>
+                        <li><a href="#">Kontak</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Hubungi Kami</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Jl. Contoh No. 123, Jakarta</p>
+                    <p><i class="fas fa-phone"></i> +62 812-3456-7890</p>
+                    <p><i class="fas fa-envelope"></i> info@tokopremium.com</p>
+                </div>
+            </div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 Toko Premium. Hak Cipta Dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="notification" id="notification">
+        Produk berhasil ditambahkan ke keranjang!
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const spreadsheetId = '1py5Ni_qmhBS07fCQak3qP-_JZD4Tj3tTNGF80jUqb_c';
+            const apiKey = 'AIzaSyA3s9h8q6h5r7t8u9v0w1x2y3z4a5b6c7d'; // Ganti dengan API key Anda
+            const range = 'Sheet1'; // Nama sheet Anda
+            
+            // URL untuk mengambil data dari Google Sheets API
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+            
+            // Fallback data jika API gagal
+            const fallbackData = [
+                { name: "Produk Contoh 1", picture: "https://picsum.photos/seed/product1/400/300.jpg", price: "Rp 150.000" },
+                { name: "Produk Contoh 2", picture: "https://picsum.photos/seed/product2/400/300.jpg", price: "Rp 200.000" },
+                { name: "Produk Contoh 3", picture: "https://picsum.photos/seed/product3/400/300.jpg", price: "Rp 125.000" },
+                { name: "Produk Contoh 4", picture: "https://picsum.photos/seed/product4/400/300.jpg", price: "Rp 300.000" },
+                { name: "Produk Contoh 5", picture: "https://picsum.photos/seed/product5/400/300.jpg", price: "Rp 175.000" },
+                { name: "Produk Contoh 6", picture: "https://picsum.photos/seed/product6/400/300.jpg", price: "Rp 225.000" }
+            ];
+            
+            // Fetch data dari Google Sheets
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data dari Google Sheets');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Proses data dari Google Sheets
+                    const rows = data.values;
+                    const headers = rows[0];
+                    const products = [];
+                    
+                    // Cari indeks kolom yang dibutuhkan
+                    const nameIndex = headers.indexOf('Name');
+                    const pictureIndex = headers.indexOf('picture');
+                    const priceIndex = headers.indexOf('Price');
+                    
+                    // Ambil data produk
+                    for (let i = 1; i < rows.length; i++) {
+                        if (rows[i].length >= Math.max(nameIndex, pictureIndex, priceIndex) + 1) {
+                            products.push({
+                                name: rows[i][nameIndex],
+                                picture: rows[i][pictureIndex],
+                                price: rows[i][priceIndex]
+                            });
+                        }
+                    }
+                    
+                    // Tampilkan produk
+                    displayProducts(products);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Gunakan data fallback jika API gagal
+                    displayProducts(fallbackData);
+                });
+            
+            // Fungsi untuk menampilkan produk
+            function displayProducts(products) {
+                const container = document.getElementById('productsContainer');
+                const loading = document.getElementById('loading');
+                
+                // Sembunyikan loading
+                loading.style.display = 'none';
+                
+                // Kosongkan container
+                container.innerHTML = '';
+                
+                // Tambahkan setiap produk ke container
+                products.forEach((product, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    
+                    // Tambahkan badge acak untuk demo
+                    const badges = ['new', 'sale', 'popular'];
+                    const randomBadge = badges[Math.floor(Math.random() * badges.length)];
+                    const badgeText = randomBadge === 'new' ? 'Baru' : 
+                                     randomBadge === 'sale' ? 'Promo' : 'Populer';
+                    
+                    card.innerHTML = `
+                        <div class="product-image">
+                            <img src="${product.picture}" alt="${product.name}">
+                            <span class="product-badge">${badgeText}</span>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt.</p>
+                            <div class="product-footer">
+                                <span class="product-price">${product.price}</span>
+                                <button class="add-to-cart" data-id="${index}">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                // Tambahkan event listener untuk tombol tambah ke keranjang
+                const addToCartButtons = document.querySelectorAll('.add-to-cart');
+                addToCartButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        showNotification();
+                    });
+                });
+            }
+            
+            // Fungsi untuk menampilkan notifikasi
+            function showNotification() {
+                const notification = document.getElementById('notification');
+                notification.classList.add('show');
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Filter functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Hapus class active dari semua tombol
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Tambahkan class active ke tombol yang diklik
+                    this.classList.add('active');
+                    
+                    // Filter produk (ini hanya simulasi, implementasi sebenarnya memerlukan data yang lebih lengkap)
+                    const filter = this.getAttribute('data-filter');
+                    const productCards = document.querySelectorAll('.product-card');
+                    
+                    productCards.forEach(card => {
+                        const badge = card.querySelector('.product-badge').textContent.toLowerCase();
+                        
+                        if (filter === 'all' || 
+                            (filter === 'new' && badge === 'baru') || 
+                            (filter === 'sale' && badge === 'promo') || 
+                            (filter === 'popular' && badge === 'populer')) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const productCards = document.querySelectorAll('.product-card');
+                
+                productCards.forEach(card => {
+                    const productName = card.querySelector('.product-name').textContent.toLowerCase();
+                    
+                    if (productName.includes(searchTerm)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
