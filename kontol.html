@@ -3,1524 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Penyimpanan Item - Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-pink: #ff6b9d;
-            --secondary-pink: #feca57;
-            --dark-pink: #c44569;
-            --light-pink: #ffeaa7;
-            --sidebar-width: 250px;
-            --sidebar-collapsed-width: 70px;
-        }
+    <!-- GANTI JUDUL HALAMAN DI SINI (Muncul di Tab Browser) -->
+    <title>Galeri Foto Produk Unggulan</title>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    <!-- Menghubungkan ke Google Fonts untuk tulisan yang lebih menarik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- GAYA UMUM HALAMAN --- */
+        :root {
+            --warna-utama: #2c3e50; /* Abu-abu Gelap */
+            --warna-aksen: #3498db;   /* Biru Menarik */
+            --warna-harga: #27ae60;   /* Hijau untuk Harga */
+            --warna-latar: #f8f9fa;   /* Latar Belakang Abu-abu Muda */
+            --warna-teks: #333;       /* Warna Teks Utama */
+            --warna-teks-ringan: #777;/* Warna Teks Deskripsi */
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(120deg, #f093fb 0%, #f5576c 100%);
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--warna-latar);
+            color: var(--warna-teks);
+            line-height: 1.6;
         }
 
-        /* Aurora Background Effect */
-        .aurora-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: linear-gradient(135deg, rgba(255, 0, 150, 0.3), rgba(0, 255, 255, 0.3));
-            filter: blur(40px);
-            opacity: 0.7;
-        }
-
-        .aurora-1 {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 0, 150, 0.4) 0%, rgba(255, 0, 150, 0) 70%);
-            border-radius: 50%;
-            top: -200px;
-            right: -200px;
-            animation: aurora 15s infinite alternate;
-        }
-
-        .aurora-2 {
-            position: absolute;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.4) 0%, rgba(0, 255, 255, 0) 70%);
-            border-radius: 50%;
-            bottom: -300px;
-            left: -300px;
-            animation: aurora 20s infinite alternate-reverse;
-        }
-
-        @keyframes aurora {
-            0% { transform: rotate(0deg) scale(1); opacity: 0.7; }
-            50% { transform: rotate(180deg) scale(1.1); opacity: 0.5; }
-            100% { transform: rotate(360deg) scale(1); opacity: 0.7; }
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed-width);
-        }
-
-        .sidebar-header {
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            background: linear-gradient(90deg, var(--primary-pink), var(--secondary-pink));
-            color: white;
+        }
+
+        /* --- GAYA JUDUL UTAMA --- */
+        header {
             text-align: center;
-            position: relative;
+            padding: 40px 20px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 40px;
         }
 
-        .sidebar-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        /* 
+            === PERHATIAN ===
+            Judul di bawah ini bisa Anda edit langsung dari HTML.
+            Cari teks "Judul Galeri Foto Saya" dan ganti dengan judul yang Anda inginkan.
+        */
+        header h1 {
+            color: var(--warna-utama);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
         }
 
-        .sidebar-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
+        header p {
+            color: var(--warna-teks-ringan);
+            font-size: 1.1rem;
+            margin-top: 10px;
         }
 
-        .sidebar-menu {
-            padding: 20px 0;
+        /* --- GAYA GRID GALERI FOTO (TABEL PRODUK) --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
         }
 
-        .menu-item {
-            padding: 15px 20px;
+        /* --- GAYA KARTU PRODUK (SETIAP ITEM FOTO) --- */
+        .product-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
-            align-items: center;
-            color: #333;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
+            flex-direction: column;
         }
 
-        .menu-item:hover {
-            background: rgba(255, 107, 157, 0.1);
-            color: var(--primary-pink);
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
         }
 
-        .menu-item.active {
-            background: rgba(255, 107, 157, 0.2);
-            color: var(--primary-pink);
-            border-left: 4px solid var(--primary-pink);
-        }
-
-        .menu-item i {
-            font-size: 20px;
-            width: 30px;
-            margin-right: 15px;
-            text-align: center;
-        }
-
-        .sidebar.collapsed .menu-text {
-            display: none;
-        }
-
-        .sidebar.collapsed .menu-item {
-            justify-content: center;
-            padding: 15px;
-        }
-
-        .sidebar.collapsed .menu-item i {
-            margin-right: 0;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-        }
-
-        .main-content.expanded {
-            margin-left: var(--sidebar-collapsed-width);
-        }
-
-        .content-section {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .content-section.active {
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover; /* Memastikan foto terlihat bagus dan proporsional */
             display: block;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Card Styles */
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            background-color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 20px;
-            border: none;
-        }
-
-        .card-header {
-            background: linear-gradient(90deg, var(--primary-pink), var(--secondary-pink));
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            font-weight: bold;
-            padding: 15px 20px;
-        }
-
-        /* Table Styles */
-        .table-container {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            overflow: hidden;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .table {
-            margin-bottom: 0;
-        }
-
-        .table thead {
-            position: sticky;
-            top: 0;
-            background-color: var(--primary-pink);
-            color: white;
-            z-index: 10;
-        }
-
-        .table tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: rgba(255, 182, 193, 0.3);
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(255, 182, 193, 0.5);
-            transform: scale(1.01);
-        }
-
-        /* Virtual Scrolling */
-        .virtual-scroll-container {
-            height: 400px;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .virtual-scroll-content {
-            position: relative;
-        }
-
-        /* Button Styles */
-        .btn-primary {
-            background: linear-gradient(90deg, var(--primary-pink), var(--dark-pink));
-            border: none;
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-success {
-            background: linear-gradient(90deg, #00d2d3, #01a3a4);
-            border: none;
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Form Styles */
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            padding: 10px 15px;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 0.25rem rgba(255, 107, 157, 0.25);
-        }
-
-        /* Badge Styles */
-        .stock-badge {
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.85rem;
-        }
-
-        .stock-high { background-color: #d4edda; color: #155724; }
-        .stock-medium { background-color: #fff3cd; color: #856404; }
-        .stock-low { background-color: #f8d7da; color: #721c24; }
-
-        /* Stats Cards */
-        .stats-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
-            border-radius: 15px;
+        .product-info {
             padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .stats-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--primary-pink);
-        }
-
-        /* Loading Spinner */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .loading-spinner {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-        }
-
-        /* Toast Notification */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1050;
-        }
-
-        .toast {
-            background-color: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Search Bar */
-        .search-bar {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .search-bar input {
-            padding-left: 40px;
-            border-radius: 25px;
-        }
-
-        .search-bar i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-
-        /* Pagination */
-        .pagination-container {
+            flex-grow: 1; /* Mendorong konten ke bawah */
             display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            flex-direction: column;
         }
 
-        .pagination .page-link {
-            color: var(--primary-pink);
-            border: 1px solid var(--primary-pink);
-            margin: 0 2px;
-            border-radius: 5px;
+        .product-info h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--warna-utama);
+            margin: 0 0 10px 0;
         }
 
-        .pagination .page-item.active .page-link {
-            background-color: var(--primary-pink);
-            border-color: var(--primary-pink);
+        .product-info .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--warna-harga);
+            margin: 0 0 15px 0;
         }
 
-        /* Responsive */
+        .product-info .description {
+            font-size: 0.95rem;
+            color: var(--warna-teks-ringan);
+            margin: 0;
+            flex-grow: 1; /* Membuat deskripsi mengisi ruang kosong */
+        }
+
+        /* --- UNTUK TAMPILAN DI HP/LAYAR KECIL --- */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
+            header h1 {
+                font-size: 2rem;
             }
-            
-            .sidebar.show {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                z-index: 1001;
-                background: var(--primary-pink);
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                border-radius: 5px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .mobile-menu-toggle {
-                display: none;
+            .product-grid {
+                grid-template-columns: 1fr; /* Hanya 1 kolom di layar kecil */
             }
         }
     </style>
 </head>
 <body>
-    <div class="aurora-bg">
-        <div class="aurora-1"></div>
-        <div class="aurora-2"></div>
-    </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" onclick="toggleMobileSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3 class="mb-0">Inventory Pro</h3>
-            <button class="sidebar-toggle" onclick="toggleSidebar()">
-                <i class="fas fa-chevron-left" id="sidebarToggleIcon"></i>
-            </button>
+    <header>
+        <div class="container">
+            <!-- =========================================================== -->
+            <!--                  GANTI JUDUL UTAMA DI SINI                  -->
+            <!-- =========================================================== -->
+            <h1>Judul Galeri Foto Saya</h1>
+            <p>Koleksi foto-foto pilihan dengan kualitas terbaik untuk Anda</p>
         </div>
-        <div class="sidebar-menu">
-            <a class="menu-item active" onclick="showSection('dashboard')">
-                <i class="fas fa-tachometer-alt"></i>
-                <span class="menu-text">Dashboard</span>
-            </a>
-            <a class="menu-item" onclick="showSection('items')">
-                <i class="fas fa-boxes"></i>
-                <span class="menu-text">Daftar Item</span>
-            </a>
-            <a class="menu-item" onclick="showSection('add-stock')">
-                <i class="fas fa-plus-circle"></i>
-                <span class="menu-text">Tambah Stok</span>
-            </a>
-            <a class="menu-item" onclick="showSection('sell')">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="menu-text">Jual Item</span>
-            </a>
-            <a class="menu-item" onclick="showSection('transactions')">
-                <i class="fas fa-history"></i>
-                <span class="menu-text">Riwayat</span>
-            </a>
-            <a class="menu-item" onclick="showSection('analytics')">
-                <i class="fas fa-chart-line"></i>
-                <span class="menu-text">Analitik</span>
-            </a>
-            <a class="menu-item" onclick="showSection('settings')">
-                <i class="fas fa-cog"></i>
-                <span class="menu-text">Pengaturan</span>
-            </a>
-        </div>
-    </div>
+    </header>
 
-    <!-- Main Content -->
-    <div class="main-content" id="mainContent">
-        <!-- Dashboard Section -->
-        <div class="content-section active" id="dashboard-section">
-            <h2 class="glow-text mb-4">Dashboard</h2>
-            <div class="row">
-                <div class="col-md-3 col-sm-6 mb-3">
-                    <div class="stats-card">
-                        <i class="fas fa-boxes fa-2x mb-2" style="color: var(--primary-pink);"></i>
-                        <div class="stats-number" id="totalItems">0</div>
-                        <div>Total Item</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-3">
-                    <div class="stats-card">
-                        <i class="fas fa-cubes fa-2x mb-2" style="color: var(--secondary-pink);"></i>
-                        <div class="stats-number" id="totalStock">0</div>
-                        <div>Total Stok</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-3">
-                    <div class="stats-card">
-                        <i class="fas fa-exclamation-triangle fa-2x mb-2" style="color: #f39c12;"></i>
-                        <div class="stats-number" id="lowStock">0</div>
-                        <div>Stok Rendah</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-sm-6 mb-3">
-                    <div class="stats-card">
-                        <i class="fas fa-chart-line fa-2x mb-2" style="color: #27ae60;"></i>
-                        <div class="stats-number" id="totalValue">0</div>
-                        <div>Nilai Total</div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar me-2"></i> Aktivitas Terkini
-                </div>
-                <div class="card-body">
-                    <div id="recentActivity">
-                        <p class="text-muted">Memuat aktivitas terkini...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <main class="container">
+        <div class="product-grid">
 
-        <!-- Items Section -->
-        <div class="content-section" id="items-section">
-            <h2 class="glow-text mb-4">Daftar Item</h2>
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-boxes me-2"></i> Inventory Items
-                </div>
-                <div class="card-body">
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" id="searchInput" placeholder="Cari item...">
-                    </div>
-                    <div class="table-container">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nama Item</th>
-                                    <th>Stok</th>
-                                    <th>Harga</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsTableBody">
-                                <!-- Data akan dimuat dari IndexedDB -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="pagination-container">
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination" id="pagination">
-                                <!-- Pagination akan dibuat secara dinamis -->
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <!-- =========================================================== -->
+            <!--                    AWAL DARI KARTU PRODUK 1                   -->
+            <!-- =========================================================== -->
+            <div class="product-card">
+                <!-- 
+                    === CARA MENGGANTI FOTO ===
+                    1. Simpan foto Anda dalam satu folder yang sama dengan file HTML ini, 
+                       atau dalam folder 'images'.
+                    2. Ganti 'foto-produk-1.jpg' dengan nama file foto Anda.
+                    Contoh: src="images/gunung-fuji.jpg"
+                -->
+                <img src="https://via.placeholder.com/400x250.png?text=Foto+Produk+1" alt="Foto Produk 1">
 
-        <!-- Add Stock Section -->
-        <div class="content-section" id="add-stock-section">
-            <h2 class="glow-text mb-4">Tambah Stok</h2>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-plus-circle me-2"></i> Form Tambah Stok
-                        </div>
-                        <div class="card-body">
-                            <form id="addStockForm">
-                                <div class="mb-3">
-                                    <label for="itemName" class="form-label">Nama Item</label>
-                                    <select class="form-select" id="itemName" required>
-                                        <option value="" selected disabled>Pilih Item</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="stockAmount" class="form-label">Jumlah Stok</label>
-                                    <input type="number" class="form-control" id="stockAmount" min="1" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Tanggal & Waktu</label>
-                                    <div class="timestamp" id="addTimestamp"></div>
-                                </div>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-plus me-2"></i>Tambah Stok
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-info-circle me-2"></i> Info Stok
-                        </div>
-                        <div class="card-body">
-                            <div id="stockInfo">
-                                <p class="text-muted">Pilih item untuk melihat info stok</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sell Section -->
-        <div class="content-section" id="sell-section">
-            <h2 class="glow-text mb-4">Jual Item</h2>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-shopping-cart me-2"></i> Form Penjualan
-                        </div>
-                        <div class="card-body">
-                            <form id="sellItemForm">
-                                <div class="mb-3">
-                                    <label for="sellItemName" class="form-label">Nama Item</label>
-                                    <select class="form-select" id="sellItemName" required>
-                                        <option value="" selected disabled>Pilih Item</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="sellAmount" class="form-label">Jumlah</label>
-                                    <input type="number" class="form-control" id="sellAmount" min="1" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Tanggal & Waktu</label>
-                                    <div class="timestamp" id="sellTimestamp"></div>
-                                </div>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-cash-register me-2"></i>Jual Item
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-calculator me-2"></i> Kalkulasi
-                        </div>
-                        <div class="card-body">
-                            <div id="sellCalculation">
-                                <p class="text-muted">Pilih item untuk melihat kalkulasi</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Transactions Section -->
-        <div class="content-section" id="transactions-section">
-            <h2 class="glow-text mb-4">Riwayat Transaksi</h2>
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-history me-2"></i> Semua Transaksi
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <button class="btn btn-sm btn-outline-primary" onclick="filterTransactions('all')">Semua</button>
-                        <button class="btn btn-sm btn-outline-success" onclick="filterTransactions('add')">Penambahan</button>
-                        <button class="btn btn-sm btn-outline-warning" onclick="filterTransactions('sell')">Penjualan</button>
-                    </div>
-                    <div class="table-container">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID Transaksi</th>
-                                    <th>Tanggal & Waktu</th>
-                                    <th>Jenis</th>
-                                    <th>Nama Item</th>
-                                    <th>Jumlah</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionHistory">
-                                <!-- Riwayat transaksi akan ditampilkan di sini -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Analytics Section -->
-        <div class="content-section" id="analytics-section">
-            <h2 class="glow-text mb-4">Analitik</h2>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-chart-pie me-2"></i> Distribusi Stok
-                        </div>
-                        <div class="card-body">
-                            <canvas id="stockChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-chart-line me-2"></i> Tren Penjualan
-                        </div>
-                        <div class="card-body">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <i class="fas fa-trophy me-2"></i> Top Items
-                        </div>
-                        <div class="card-body">
-                            <div id="topItems">
-                                <!-- Top items akan ditampilkan di sini -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Section -->
-        <div class="content-section" id="settings-section">
-            <h2 class="glow-text mb-4">Pengaturan</h2>
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-cog me-2"></i> Konfigurasi Sistem
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label for="lowStockThreshold" class="form-label">Batas Stok Rendah</label>
-                        <input type="number" class="form-control" id="lowStockThreshold" value="10">
-                    </div>
-                    <div class="mb-3">
-                        <label for="currency" class="form-label">Mata Uang</label>
-                        <select class="form-select" id="currency">
-                            <option value="IDR">Indonesian Rupiah (IDR)</option>
-                            <option value="USD">US Dollar (USD)</option>
-                            <option value="EUR">Euro (EUR)</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="itemsPerPage" class="form-label">Item Per Halaman</label>
-                        <select class="form-select" id="itemsPerPage">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <button class="btn btn-primary" onclick="exportData()">
-                            <i class="fas fa-download me-2"></i>Export Data
-                        </button>
-                        <button class="btn btn-danger ms-2" onclick="clearAllData()">
-                            <i class="fas fa-trash me-2"></i>Hapus Semua Data
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2">Memproses...</p>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div class="toast-container">
-        <div class="toast" id="notificationToast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong class="me-auto">Notifikasi</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body" id="toastMessage">
-                <!-- Pesan notifikasi akan ditampilkan di sini -->
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // IndexedDB Setup for Unlimited Storage
-        let db;
-        const DB_NAME = 'InventoryDB';
-        const DB_VERSION = 1;
-        const STORE_NAME = 'items';
-        const TRANSACTION_STORE = 'transactions';
-
-        // Initialize IndexedDB
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, DB_VERSION);
-                
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => {
-                    db = request.result;
-                    resolve(db);
-                };
-                
-                request.onupgradeneeded = (event) => {
-                    db = event.target.result;
+                <div class="product-info">
+                    <!-- GANTI NAMA PRODUK 1 -->
+                    <h3>Nama Produk 1</h3>
                     
-                    // Create items store
-                    if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        const itemStore = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                        itemStore.createIndex('name', 'name', { unique: false });
-                        itemStore.createIndex('stock', 'stock', { unique: false });
-                    }
+                    <!-- GANTI HARGA PRODUK 1 -->
+                    <p class="price">Rp 250.000</p>
                     
-                    // Create transactions store
-                    if (!db.objectStoreNames.contains(TRANSACTION_STORE)) {
-                        const transactionStore = db.createObjectStore(TRANSACTION_STORE, { keyPath: 'id', autoIncrement: true });
-                        transactionStore.createIndex('date', 'date', { unique: false });
-                        transactionStore.createIndex('type', 'type', { unique: false });
-                    }
-                };
-            });
-        }
+                    <!-- GANTI DESKRIPSI / CATATAN PRODUK 1 -->
+                    <p class="description">
+                        Foto ini diambil saat golden hour, menampilkan permainan cahaya yang sempurna. 
+                        Sangat cocok untuk hiasan dinding ruang tamu atau kantor. Kualitas cetak high resolution.
+                    </p>
+                </div>
+            </div>
+            <!-- =========================================================== -->
+            <!--                    AKHIR DARI KARTU PRODUK 1                   -->
+            <!-- =========================================================== -->
 
-        // Data Management
-        let itemsData = [];
-        let transactionHistory = [];
-        let currentPage = 1;
-        let itemsPerPage = 10;
-        let filteredItems = [];
-        let currentFilter = 'all';
 
-        // Performance optimization: Debounce function
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
 
-        // Load data from IndexedDB
-        async function loadData() {
-            showLoading(true);
-            try {
-                await initDB();
-                
-                // Load items
-                const transaction = db.transaction([STORE_NAME], 'readonly');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.getAll();
-                
-                request.onsuccess = () => {
-                    itemsData = request.result;
-                    if (itemsData.length === 0) {
-                        // Add sample data if empty
-                        addSampleData();
-                    } else {
-                        filteredItems = [...itemsData];
-                        updateAllViews();
-                    }
-                };
-                
-                // Load transactions
-                const transTransaction = db.transaction([TRANSACTION_STORE], 'readonly');
-                const transStore = transTransaction.objectStore(TRANSACTION_STORE);
-                const transRequest = transStore.getAll();
-                
-                transRequest.onsuccess = () => {
-                    transactionHistory = transRequest.result;
-                    updateTransactionHistory();
-                    updateDashboard();
-                };
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showNotification('Error loading data. Using sample data.', 'warning');
-                addSampleData();
-            } finally {
-                showLoading(false);
-            }
-        }
+            <!-- =========================================================== -->
+            <!--                    AWAL DARI KARTU PRODUK 2                   -->
+            <!-- =========================================================== -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/400x250.png?text=Foto+Produk+2" alt="Foto Produk 2">
 
-        // Add sample data
-        function addSampleData() {
-            const sampleItems = [
-                { id: 'ITEM-1', name: 'Laptop', stock: 10, price: 8000000, category: 'Electronics' },
-                { id: 'ITEM-2', name: 'Smartphone', stock: 25, price: 5000000, category: 'Electronics' },
-                { id: 'ITEM-3', name: 'Tablet', stock: 15, price: 3000000, category: 'Electronics' },
-                { id: 'ITEM-4', name: 'Headphone', stock: 30, price: 500000, category: 'Accessories' },
-                { id: 'ITEM-5', name: 'Smartwatch', stock: 20, price: 1500000, category: 'Accessories' },
-                { id: 'ITEM-6', name: 'Keyboard', stock: 50, price: 300000, category: 'Accessories' },
-                { id: 'ITEM-7', name: 'Mouse', stock: 45, price: 150000, category: 'Accessories' },
-                { id: 'ITEM-8', name: 'Monitor', stock: 12, price: 2000000, category: 'Electronics' }
-            ];
-            
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-            
-            sampleItems.forEach(item => {
-                store.add(item);
-            });
-            
-            transaction.oncomplete = () => {
-                itemsData = sampleItems;
-                filteredItems = [...itemsData];
-                updateAllViews();
-                showNotification('Data sampel berhasil ditambahkan', 'success');
-            };
-        }
-
-        // Save item to IndexedDB
-        function saveItem(item) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.put(item);
-                
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // Save transaction to IndexedDB
-        function saveTransaction(transaction) {
-            return new Promise((resolve, reject) => {
-                const trans = db.transaction([TRANSACTION_STORE], 'readwrite');
-                const store = trans.objectStore(TRANSACTION_STORE);
-                const request = store.add(transaction);
-                
-                request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        // Update all views
-        function updateAllViews() {
-            updateItemsTable();
-            updateItemDropdowns();
-            updateDashboard();
-            updatePagination();
-        }
-
-        // Update items table with pagination
-        function updateItemsTable() {
-            const tableBody = document.getElementById('itemsTableBody');
-            const startIndex = (currentPage - 1) * itemsPerPage;
-            const endIndex = startIndex + itemsPerPage;
-            const pageItems = filteredItems.slice(startIndex, endIndex);
-            
-            tableBody.innerHTML = '';
-            
-            pageItems.forEach(item => {
-                const row = document.createElement('tr');
-                
-                let stockClass = 'stock-high';
-                if (item.stock < 10) {
-                    stockClass = 'stock-low';
-                } else if (item.stock < 20) {
-                    stockClass = 'stock-medium';
-                }
-                
-                row.innerHTML = `
-                    <td>${item.id}</td>
-                    <td>${item.name}</td>
-                    <td><span class="stock-badge ${stockClass}">${item.stock}</span></td>
-                    <td>Rp ${parseInt(item.price).toLocaleString('id-ID')}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-sm btn-primary" onclick="quickAddStock('${item.id}')">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                            <button class="btn btn-sm btn-success" onclick="quickSellItem('${item.id}')">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Update pagination
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-            const pagination = document.getElementById('pagination');
-            pagination.innerHTML = '';
-            
-            // Previous button
-            const prevLi = document.createElement('li');
-            prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-            prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>`;
-            pagination.appendChild(prevLi);
-            
-            // Page numbers
-            for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement('li');
-                li.className = `page-item ${i === currentPage ? 'active' : ''}`;
-                li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
-                pagination.appendChild(li);
-            }
-            
-            // Next button
-            const nextLi = document.createElement('li');
-            nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-            nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>`;
-            pagination.appendChild(nextLi);
-        }
-
-        // Change page
-        function changePage(page) {
-            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-            if (page >= 1 && page <= totalPages) {
-                currentPage = page;
-                updateItemsTable();
-                updatePagination();
-            }
-        }
-
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', debounce((e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                filteredItems = itemsData.filter(item => 
-                    item.name.toLowerCase().includes(searchTerm) ||
-                    item.id.toLowerCase().includes(searchTerm)
-                );
-                currentPage = 1;
-                updateItemsTable();
-                updatePagination();
-            }, 300));
-        }
-
-        // Update item dropdowns
-        function updateItemDropdowns() {
-            const addDropdown = document.getElementById('itemName');
-            const sellDropdown = document.getElementById('sellItemName');
-            
-            if (addDropdown) {
-                addDropdown.innerHTML = '<option value="" selected disabled>Pilih Item</option>';
-                itemsData.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.name;
-                    addDropdown.appendChild(option);
-                });
-            }
-            
-            if (sellDropdown) {
-                sellDropdown.innerHTML = '<option value="" selected disabled>Pilih Item</option>';
-                itemsData.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.id;
-                    option.textContent = item.name;
-                    sellDropdown.appendChild(option);
-                });
-            }
-        }
-
-        // Update dashboard
-        function updateDashboard() {
-            const totalItems = itemsData.length;
-            const totalStock = itemsData.reduce((sum, item) => sum + parseInt(item.stock), 0);
-            const lowStock = itemsData.filter(item => item.stock < 10).length;
-            const totalValue = itemsData.reduce((sum, item) => sum + (parseInt(item.stock) * parseInt(item.price)), 0);
-            
-            document.getElementById('totalItems').textContent = totalItems;
-            document.getElementById('totalStock').textContent = totalStock;
-            document.getElementById('lowStock').textContent = lowStock;
-            document.getElementById('totalValue').textContent = `Rp ${totalValue.toLocaleString('id-ID')}`;
-            
-            // Update recent activity
-            updateRecentActivity();
-        }
-
-        // Update recent activity
-        function updateRecentActivity() {
-            const recentActivity = document.getElementById('recentActivity');
-            const recentTransactions = transactionHistory.slice(0, 5);
-            
-            if (recentTransactions.length === 0) {
-                recentActivity.innerHTML = '<p class="text-muted">Belum ada aktivitas</p>';
-                return;
-            }
-            
-            let html = '<div class="list-group">';
-            recentTransactions.forEach(trans => {
-                const icon = trans.type === 'add' ? 'fa-plus-circle text-success' : 'fa-minus-circle text-warning';
-                html += `
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="fas ${icon} me-2"></i>
-                                <strong>${trans.itemName}</strong>
-                                <span class="badge bg-secondary ms-2">${trans.amount}</span>
-                            </div>
-                            <small class="text-muted">${new Date(trans.date).toLocaleString('id-ID')}</small>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            recentActivity.innerHTML = html;
-        }
-
-        // Add stock
-        async function addStock(itemId, amount) {
-            showLoading(true);
-            try {
-                const item = itemsData.find(i => i.id === itemId);
-                if (item) {
-                    item.stock = parseInt(item.stock) + parseInt(amount);
-                    await saveItem(item);
+                <div class="product-info">
+                    <!-- GANTI NAMA PRODUK 2 -->
+                    <h3>Nama Produk 2</h3>
                     
-                    const transaction = {
-                        id: `TRX-${Date.now()}`,
-                        date: new Date().toISOString(),
-                        type: 'add',
-                        itemName: item.name,
-                        amount: amount,
-                        total: amount * item.price
-                    };
+                    <!-- GANTI HARGA PRODUK 2 -->
+                    <p class="price">Rp 350.000</p>
                     
-                    await saveTransaction(transaction);
-                    transactionHistory.unshift(transaction);
+                    <!-- GANTI DESKRIPSI / CATATAN PRODUK 2 -->
+                    <p class="description">
+                        Potret makro alam yang memukau. Setiap detail terlihat sangat jelas. 
+                        Catatan: Foto ini hanya tersedia dalam ukuran cetak A3 ke atas.
+                    </p>
+                </div>
+            </div>
+            <!-- =========================================================== -->
+            <!--                    AKHIR DARI KARTU PRODUK 2                   -->
+            <!-- =========================================================== -->
+
+
+
+            <!-- =========================================================== -->
+            <!--                    AWAL DARI KARTU PRODUK 3                   -->
+            <!-- =========================================================== -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/400x250.png?text=Foto+Produk+3" alt="Foto Produk 3">
+
+                <div class="product-info">
+                    <!-- GANTI NAMA PRODUK 3 -->
+                    <h3>Nama Produk 3</h3>
                     
-                    updateAllViews();
-                    updateTransactionHistory();
-                    showNotification(`Berhasil menambah ${amount} stok untuk ${item.name}`, 'success');
-                }
-            } catch (error) {
-                console.error('Error adding stock:', error);
-                showNotification('Error menambah stok', 'danger');
-            } finally {
-                showLoading(false);
-            }
-        }
+                    <!-- GANTI HARGA PRODUK 3 -->
+                    <p class="price">Rp 150.000</p>
+                    
+                    <!-- GANTI DESKRIPSI / CATATAN PRODUK 3 -->
+                    <p class="description">
+                        Moment langka yang berhasil diabadikan. Foto ini menceritakan sebuah kisah tanpa kata. 
+                        Cocok untuk Anda yang menyukai foto dengan nilai filosofis tinggi.
+                    </p>
+                </div>
+            </div>
+            <!-- =========================================================== -->
+            <!--                    AKHIR DARI KARTU PRODUK 3                   -->
+            <!-- =========================================================== -->
 
-        // Sell item
-        async function sellItem(itemId, amount) {
-            showLoading(true);
-            try {
-                const item = itemsData.find(i => i.id === itemId);
-                if (item) {
-                    if (parseInt(item.stock) >= parseInt(amount)) {
-                        item.stock = parseInt(item.stock) - parseInt(amount);
-                        await saveItem(item);
-                        
-                        const transaction = {
-                            id: `TRX-${Date.now()}`,
-                            date: new Date().toISOString(),
-                            type: 'sell',
-                            itemName: item.name,
-                            amount: amount,
-                            total: amount * item.price
-                        };
-                        
-                        await saveTransaction(transaction);
-                        transactionHistory.unshift(transaction);
-                        
-                        updateAllViews();
-                        updateTransactionHistory();
-                        showNotification(`Berhasil menjual ${amount} ${item.name}`, 'success');
-                    } else {
-                        showNotification(`Stok ${item.name} tidak mencukupi. Stok tersedia: ${item.stock}`, 'danger');
-                    }
-                }
-            } catch (error) {
-                console.error('Error selling item:', error);
-                showNotification('Error menjual item', 'danger');
-            } finally {
-                showLoading(false);
-            }
-        }
+        </div>
+    </main>
 
-        // Quick add stock
-        function quickAddStock(itemId) {
-            const amount = prompt('Masukkan jumlah stok yang ingin ditambahkan:');
-            if (amount && !isNaN(amount) && parseInt(amount) > 0) {
-                addStock(itemId, amount);
-            }
-        }
-
-        // Quick sell item
-        function quickSellItem(itemId) {
-            const amount = prompt('Masukkan jumlah item yang ingin dijual:');
-            if (amount && !isNaN(amount) && parseInt(amount) > 0) {
-                sellItem(itemId, amount);
-            }
-        }
-
-        // Update transaction history
-        function updateTransactionHistory() {
-            const historyBody = document.getElementById('transactionHistory');
-            if (!historyBody) return;
-            
-            let filteredTransactions = transactionHistory;
-            if (currentFilter !== 'all') {
-                filteredTransactions = transactionHistory.filter(t => t.type === currentFilter);
-            }
-            
-            if (filteredTransactions.length === 0) {
-                historyBody.innerHTML = '<tr><td colspan="6" class="text-center">Belum ada transaksi</td></tr>';
-                return;
-            }
-            
-            historyBody.innerHTML = '';
-            filteredTransactions.slice(0, 50).forEach(transaction => {
-                const row = document.createElement('tr');
-                const typeIcon = transaction.type === 'add' ? 
-                    '<i class="fas fa-plus-circle text-success"></i>' : 
-                    '<i class="fas fa-minus-circle text-warning"></i>';
-                
-                row.innerHTML = `
-                    <td>${transaction.id}</td>
-                    <td>${new Date(transaction.date).toLocaleString('id-ID')}</td>
-                    <td>${typeIcon} ${transaction.type === 'add' ? 'Penambahan' : 'Penjualan'}</td>
-                    <td>${transaction.itemName}</td>
-                    <td>${transaction.amount}</td>
-                    <td>Rp ${transaction.total.toLocaleString('id-ID')}</td>
-                `;
-                historyBody.appendChild(row);
-            });
-        }
-
-        // Filter transactions
-        function filterTransactions(type) {
-            currentFilter = type;
-            updateTransactionHistory();
-        }
-
-        // Sidebar functions
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const icon = document.getElementById('sidebarToggleIcon');
-            
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            
-            if (sidebar.classList.contains('collapsed')) {
-                icon.className = 'fas fa-chevron-right';
-            } else {
-                icon.className = 'fas fa-chevron-left';
-            }
-        }
-
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('show');
-        }
-
-        // Show section
-        function showSection(sectionName) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(`${sectionName}-section`).classList.add('active');
-            
-            // Update menu active state
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.target.closest('.menu-item').classList.add('active');
-            
-            // Close mobile sidebar
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('show');
-            }
-            
-            // Update specific section data
-            if (sectionName === 'analytics') {
-                updateAnalytics();
-            }
-        }
-
-        // Update analytics
-        function updateAnalytics() {
-            // Stock distribution chart
-            const stockCtx = document.getElementById('stockChart');
-            if (stockCtx) {
-                new Chart(stockCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: itemsData.map(item => item.name),
-                        datasets: [{
-                            data: itemsData.map(item => item.stock),
-                            backgroundColor: [
-                                '#FF6B9D', '#FECA57', '#48DBFB', '#FF9FF3',
-                                '#54A0FF', '#5F27CD', '#00D2D3', '#1DD1A1'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Sales trend chart
-            const salesCtx = document.getElementById('salesChart');
-            if (salesCtx) {
-                const salesData = transactionHistory
-                    .filter(t => t.type === 'sell')
-                    .reduce((acc, t) => {
-                        const date = new Date(t.date).toLocaleDateString();
-                        acc[date] = (acc[date] || 0) + t.total;
-                        return acc;
-                    }, {});
-                
-                new Chart(salesCtx, {
-                    type: 'line',
-                    data: {
-                        labels: Object.keys(salesData).slice(-7),
-                        datasets: [{
-                            label: 'Penjualan',
-                            data: Object.values(salesData).slice(-7),
-                            borderColor: '#FF6B9D',
-                            backgroundColor: 'rgba(255, 107, 157, 0.1)',
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Top items
-            const topItems = document.getElementById('topItems');
-            if (topItems) {
-                const topSelling = transactionHistory
-                    .filter(t => t.type === 'sell')
-                    .reduce((acc, t) => {
-                        acc[t.itemName] = (acc[t.itemName] || 0) + t.amount;
-                        return acc;
-                    }, {});
-                
-                const sorted = Object.entries(topSelling)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 5);
-                
-                let html = '<div class="list-group">';
-                sorted.forEach((item, index) => {
-                    html += `
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <span class="badge bg-primary me-2">${index + 1}</span>
-                                ${item[0]}
-                            </div>
-                            <span class="badge bg-success">${item[1]} terjual</span>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                topItems.innerHTML = html;
-            }
-        }
-
-        // Show/hide loading
-        function showLoading(show) {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.style.display = show ? 'flex' : 'none';
-        }
-
-        // Show notification
-        function showNotification(message, type = 'info') {
-            const toastElement = document.getElementById('notificationToast');
-            const toastMessage = document.getElementById('toastMessage');
-            
-            toastMessage.textContent = message;
-            
-            toastElement.className = 'toast';
-            if (type === 'success') {
-                toastElement.classList.add('bg-success', 'text-white');
-            } else if (type === 'danger') {
-                toastElement.classList.add('bg-danger', 'text-white');
-            } else if (type === 'warning') {
-                toastElement.classList.add('bg-warning');
-            }
-            
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-        }
-
-        // Update timestamps
-        function updateTimestamps() {
-            const now = new Date().toLocaleString('id-ID');
-            const addTimestamp = document.getElementById('addTimestamp');
-            const sellTimestamp = document.getElementById('sellTimestamp');
-            
-            if (addTimestamp) addTimestamp.textContent = now;
-            if (sellTimestamp) sellTimestamp.textContent = now;
-        }
-
-        // Export data
-        function exportData() {
-            const data = {
-                items: itemsData,
-                transactions: transactionHistory,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `inventory_export_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showNotification('Data berhasil diekspor', 'success');
-        }
-
-        // Clear all data
-        function clearAllData() {
-            if (confirm('Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan.')) {
-                const transaction = db.transaction([STORE_NAME, TRANSACTION_STORE], 'readwrite');
-                const itemStore = transaction.objectStore(STORE_NAME);
-                const transStore = transaction.objectStore(TRANSACTION_STORE);
-                
-                itemStore.clear();
-                transStore.clear();
-                
-                transaction.oncomplete = () => {
-                    itemsData = [];
-                    transactionHistory = [];
-                    filteredItems = [];
-                    updateAllViews();
-                    updateTransactionHistory();
-                    showNotification('Semua data telah dihapus', 'success');
-                };
-            }
-        }
-
-        // Form event listeners
-        document.getElementById('addStockForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const itemId = document.getElementById('itemName').value;
-            const amount = document.getElementById('stockAmount').value;
-            
-            if (itemId && amount) {
-                addStock(itemId, amount);
-                this.reset();
-                updateTimestamps();
-            }
-        });
-
-        document.getElementById('sellItemForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const itemId = document.getElementById('sellItemName').value;
-            const amount = document.getElementById('sellAmount').value;
-            
-            if (itemId && amount) {
-                sellItem(itemId, amount);
-                this.reset();
-                updateTimestamps();
-            }
-        });
-
-        // Settings event listeners
-        document.getElementById('itemsPerPage')?.addEventListener('change', function(e) {
-            itemsPerPage = parseInt(e.target.value);
-            currentPage = 1;
-            updateItemsTable();
-            updatePagination();
-        });
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            updateTimestamps();
-            setInterval(updateTimestamps, 1000);
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.getElementById('sidebar').classList.remove('show');
-            }
-        });
-    </script>
 </body>
 </html>
