@@ -3,20 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koleksi Produk Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>CYBERSEARCH - Mesin Pencari Cyberpunk</title>
     <style>
-        :root {
-            --primary-color: #4a6cf7;
-            --secondary-color: #6c63ff;
-            --accent-color: #ff6b6b;
-            --text-color: #333;
-            --light-bg: #f8f9fa;
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -24,655 +12,649 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #06b6d4;
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            position: sticky;
+        /* Background Grid */
+        .bg-grid {
+            position: fixed;
             top: 0;
-            z-index: 100;
-            padding: 20px 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, #000 50%, rgba(6, 182, 212, 0.1) 100%);
+            pointer-events: none;
+            z-index: 1;
         }
 
-        .header-content {
+        .bg-grid::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Glitch Effect */
+        @keyframes glitch {
+            0%, 100% {
+                text-shadow: 
+                    0.05em 0 0 rgba(255, 0, 0, 0.75),
+                    -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
+                    0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+            15% {
+                text-shadow: 
+                    -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
+                    0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
+                    -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+            50% {
+                text-shadow: 
+                    0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
+                    0.05em 0 0 rgba(0, 255, 0, 0.75),
+                    0 -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+        }
+
+        /* Neon Flicker */
+        @keyframes neon-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+            }
+            20%, 22%, 24%, 55% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Scanline Effect */
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100%);
+            }
+        }
+
+        .glitch {
+            animation: glitch 2.5s infinite;
+        }
+
+        .neon-flicker {
+            animation: neon-flicker 1.5s infinite;
+        }
+
+        .scanline {
+            position: relative;
+        }
+
+        .scanline::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .container {
+            position: relative;
+            z-index: 10;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo-container {
             display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        .logo i {
-            margin-right: 10px;
-            font-size: 2rem;
+        .icon {
+            width: 48px;
+            height: 48px;
+            position: relative;
+        }
+
+        .icon-cpu {
+            color: #06b6d4;
+            animation: pulse 2s infinite;
+        }
+
+        .icon-globe {
+            color: #a855f7;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .icon-glow {
+            position: absolute;
+            inset: 0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            filter: blur(20px);
+            animation: pulse 2s infinite;
+        }
+
+        .cpu-glow {
+            background: rgba(6, 182, 212, 0.2);
+        }
+
+        .globe-glow {
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: rgba(6, 182, 212, 0.7);
+            font-size: 1.125rem;
+            margin-top: 16px;
+        }
+
+        /* Search Form */
+        .search-form {
+            width: 100%;
+            max-width: 672px;
+            margin-bottom: 32px;
         }
 
         .search-container {
             position: relative;
-            width: 300px;
+            group: true;
+        }
+
+        .search-glow {
+            position: absolute;
+            inset: -4px;
+            background: linear-gradient(90deg, #0891b2, #a855f7);
+            border-radius: 8px;
+            filter: blur(12px);
+            opacity: 0.75;
+            animation: pulse 2s infinite;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: flex;
+            gap: 8px;
         }
 
         .search-input {
-            width: 100%;
-            padding: 10px 40px 10px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            transition: var(--transition);
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.5);
+            color: #06b6d4;
+            font-family: 'Courier New', monospace;
+            font-size: 1.125rem;
+            padding: 16px 24px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: rgba(6, 182, 212, 0.5);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2);
+            border-color: #06b6d4;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
         }
 
-        .search-btn {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--primary-color);
+        .search-button {
+            background: linear-gradient(90deg, #0891b2, #a855f7);
+            color: #000;
+            font-weight: bold;
+            padding: 16px 32px;
             border: none;
-            color: white;
-            width: 32px;
-            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+        }
+
+        .search-button:hover {
+            background: linear-gradient(90deg, #06b6d4, #9333ea);
+            transform: scale(1.05);
+        }
+
+        .search-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #000;
+            border-top: 2px solid transparent;
             border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        .search-btn:hover {
-            background: var(--secondary-color);
-        }
-
-        .hero {
-            padding: 60px 0;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: fadeInDown 0.8s ease;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            color: #666;
-            animation: fadeInUp 0.8s ease;
-        }
-
-        .filter-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .filter-btn {
-            padding: 8px 20px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        .products-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            animation: fadeIn 0.5s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .product-image {
-            height: 220px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .product-card:hover .product-image img {
-            transform: scale(1.1);
-        }
-
-        .product-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--accent-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .product-info {
-            padding: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .product-description {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            flex-grow: 1;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .product-price {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .add-to-cart {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-        }
-
-        .add-to-cart:hover {
-            background: var(--secondary-color);
-        }
-
-        .add-to-cart i {
-            margin-left: 5px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
-            color: #666;
-        }
-
-        .loading i {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: var(--primary-color);
-            animation: spin 2s infinite linear;
-        }
-
-        footer {
-            background: #333;
-            color: white;
-            padding: 40px 0;
-            text-align: center;
-        }
-
-        .footer-content {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .footer-section {
-            flex: 1;
-            min-width: 200px;
-            margin: 10px;
-        }
-
-        .footer-section h3 {
-            margin-bottom: 15px;
-            color: var(--primary-color);
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 8px;
-        }
-
-        .footer-section a {
-            color: #ccc;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-section a:hover {
-            color: white;
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            transition: var(--transition);
-        }
-
-        .social-links a:hover {
-            background: var(--primary-color);
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 20px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary-color);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
+        /* Results */
+        .results-container {
+            width: 100%;
+            max-width: 896px;
+        }
+
+        .results-header {
+            color: rgba(6, 182, 212, 0.7);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 16px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+        }
+
+        .result-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .result-bullet {
+            width: 8px;
+            height: 8px;
+            background: #06b6d4;
+            border-radius: 50%;
+            margin-top: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-title {
+            color: #67e8f9;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .result-title a {
+            color: inherit;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-title a:hover {
+            color: #a5f3fc;
+        }
+
+        .result-url {
+            color: rgba(6, 182, 212, 0.6);
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-snippet {
+            color: rgba(6, 182, 212, 0.8);
+            line-height: 1.5;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 0.75rem;
+            color: rgba(6, 182, 212, 0.5);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 48px 0;
+        }
+
+        .no-results-title {
+            color: rgba(6, 182, 212, 0.5);
+            font-size: 1.125rem;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 8px;
+        }
+
+        .no-results-subtitle {
+            color: rgba(6, 182, 212, 0.3);
+            font-size: 0.875rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Footer */
+        .footer {
+            position: absolute;
+            bottom: 16px;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .footer-text {
+            color: rgba(6, 182, 212, 0.3);
+            font-size: 0.75rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
+            .title {
+                font-size: 3rem;
             }
-
-            .header-content {
+            
+            .search-wrapper {
                 flex-direction: column;
-                gap: 15px;
             }
-
-            .search-container {
+            
+            .search-button {
                 width: 100%;
             }
+        }
 
-            .products-container {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-                gap: 20px;
-            }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, rgba(6, 182, 212, 0.6), rgba(168, 85, 247, 0.6));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, rgba(6, 182, 212, 0.8), rgba(168, 85, 247, 0.8));
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <a href="#" class="logo">
-                    <i class="fas fa-store"></i>
-                    Toko Premium
-                </a>
-                <div class="search-container">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Cari produk...">
-                    <button class="search-btn" id="searchBtn">
-                        <i class="fas fa-search"></i>
+    <div class="bg-grid"></div>
+    
+    <div class="container scanline">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="icon">
+                    <svg class="icon-cpu" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm7 0h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
+                    </svg>
+                    <div class="icon-glow cpu-glow"></div>
+                </div>
+                <h1 class="title glitch">CYBERSEARCH</h1>
+                <div class="icon">
+                    <svg class="icon-globe" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                    </svg>
+                    <div class="icon-glow globe-glow"></div>
+                </div>
+            </div>
+            <p class="subtitle neon-flicker">// AKSES FRONTIER DIGITAL //</p>
+        </header>
+
+        <!-- Search Form -->
+        <form class="search-form" onsubmit="handleSearch(event)">
+            <div class="search-container">
+                <div class="search-glow"></div>
+                <div class="search-wrapper">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="searchInput"
+                        placeholder="INISIASI PROTOCOL PENCARIAN..."
+                        required
+                    >
+                    <button type="submit" class="search-button" id="searchButton">
+                        <span id="buttonText">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                            </svg>
+                            SEARCH
+                        </span>
                     </button>
                 </div>
             </div>
-        </div>
-    </header>
+        </form>
 
-    <section class="hero">
-        <div class="container">
-            <h1>Koleksi Produk Unggulan</h1>
-            <p>Temukan produk berkualitas tinggi dengan harga terbaik. Koleksi kami dipilih dengan teliti untuk memenuhi kebutuhan Anda.</p>
-            <div class="filter-container">
-                <button class="filter-btn active" data-filter="all">Semua Produk</button>
-                <button class="filter-btn" data-filter="new">Produk Baru</button>
-                <button class="filter-btn" data-filter="sale">Promo</button>
-                <button class="filter-btn" data-filter="popular">Populer</button>
-            </div>
+        <!-- Results Container -->
+        <div class="results-container" id="resultsContainer" style="display: none;">
+            <div class="results-header" id="resultsHeader"></div>
+            <div id="resultsList"></div>
         </div>
-    </section>
 
-    <main class="container">
-        <div class="loading" id="loading">
-            <i class="fas fa-spinner"></i>
-            <p>Sedang memuat produk...</p>
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display: none;">
+            <div class="no-results-title">TIDAK ADA DATA YANG DITEMUKAN DALAM MATRIX</div>
+            <div class="no-results-subtitle">COBA PARAMETER PENCARIAN YANG BERBEDA</div>
         </div>
-        <div class="products-container" id="productsContainer"></div>
-    </main>
 
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>Tentang Kami</h3>
-                    <p>Kami menyediakan produk berkualitas dengan harga terjangkau untuk memenuhi kebutuhan sehari-hari Anda.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Link Cepat</h3>
-                    <ul>
-                        <li><a href="#">Beranda</a></li>
-                        <li><a href="#">Produk</a></li>
-                        <li><a href="#">Promo</a></li>
-                        <li><a href="#">Kontak</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Hubungi Kami</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> Jl. Contoh No. 123, Jakarta</p>
-                    <p><i class="fas fa-phone"></i> +62 812-3456-7890</p>
-                    <p><i class="fas fa-envelope"></i> info@tokopremium.com</p>
-                </div>
-            </div>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2023 Toko Premium. Hak Cipta Dilindungi.</p>
-            </div>
-        </div>
-    </footer>
-
-    <div class="notification" id="notification">
-        Produk berhasil ditambahkan ke keranjang!
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer-text">&lt; CYBERSEARCH ENGINE v2.0.77 &gt;</p>
+        </footer>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const spreadsheetId = '1py5Ni_qmhBS07fCQak3qP-_JZD4Tj3tTNGF80jUqb_c';
-            const apiKey = 'AIzaSyA3s9h8q6h5r7t8u9v0w1x2y3z4a5b6c7d'; // Ganti dengan API key Anda
-            const range = 'Sheet1'; // Nama sheet Anda
+        let isSearching = false;
+
+        async function handleSearch(event) {
+            event.preventDefault();
             
-            // URL untuk mengambil data dari Google Sheets API
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
+            if (isSearching) return;
             
-            // Fallback data jika API gagal
-            const fallbackData = [
-                { name: "Produk Contoh 1", picture: "https://picsum.photos/seed/product1/400/300.jpg", price: "Rp 150.000" },
-                { name: "Produk Contoh 2", picture: "https://picsum.photos/seed/product2/400/300.jpg", price: "Rp 200.000" },
-                { name: "Produk Contoh 3", picture: "https://picsum.photos/seed/product3/400/300.jpg", price: "Rp 125.000" },
-                { name: "Produk Contoh 4", picture: "https://picsum.photos/seed/product4/400/300.jpg", price: "Rp 300.000" },
-                { name: "Produk Contoh 5", picture: "https://picsum.photos/seed/product5/400/300.jpg", price: "Rp 175.000" },
-                { name: "Produk Contoh 6", picture: "https://picsum.photos/seed/product6/400/300.jpg", price: "Rp 225.000" }
-            ];
-            
-            // Fetch data dari Google Sheets
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Gagal mengambil data dari Google Sheets');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Proses data dari Google Sheets
-                    const rows = data.values;
-                    const headers = rows[0];
-                    const products = [];
-                    
-                    // Cari indeks kolom yang dibutuhkan
-                    const nameIndex = headers.indexOf('Name');
-                    const pictureIndex = headers.indexOf('picture');
-                    const priceIndex = headers.indexOf('Price');
-                    
-                    // Ambil data produk
-                    for (let i = 1; i < rows.length; i++) {
-                        if (rows[i].length >= Math.max(nameIndex, pictureIndex, priceIndex) + 1) {
-                            products.push({
-                                name: rows[i][nameIndex],
-                                picture: rows[i][pictureIndex],
-                                price: rows[i][priceIndex]
-                            });
-                        }
-                    }
-                    
-                    // Tampilkan produk
-                    displayProducts(products);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Gunakan data fallback jika API gagal
-                    displayProducts(fallbackData);
-                });
-            
-            // Fungsi untuk menampilkan produk
-            function displayProducts(products) {
-                const container = document.getElementById('productsContainer');
-                const loading = document.getElementById('loading');
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            isSearching = true;
+            updateSearchButton(true);
+            hideResults();
+
+            try {
+                // Simulasi pencarian (ganti dengan API endpoint yang sesuai)
+                await simulateSearch(query);
                 
-                // Sembunyikan loading
-                loading.style.display = 'none';
+                // Untuk implementasi nyata, gunakan:
+                // const results = await performRealSearch(query);
+                // displayResults(results, query);
                 
-                // Kosongkan container
-                container.innerHTML = '';
-                
-                // Tambahkan setiap produk ke container
-                products.forEach((product, index) => {
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    
-                    // Tambahkan badge acak untuk demo
-                    const badges = ['new', 'sale', 'popular'];
-                    const randomBadge = badges[Math.floor(Math.random() * badges.length)];
-                    const badgeText = randomBadge === 'new' ? 'Baru' : 
-                                     randomBadge === 'sale' ? 'Promo' : 'Populer';
-                    
-                    card.innerHTML = `
-                        <div class="product-image">
-                            <img src="${product.picture}" alt="${product.name}">
-                            <span class="product-badge">${badgeText}</span>
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-name">${product.name}</h3>
-                            <p class="product-description">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt.</p>
-                            <div class="product-footer">
-                                <span class="product-price">${product.price}</span>
-                                <button class="add-to-cart" data-id="${index}">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
+            } catch (error) {
+                console.error('Search failed:', error);
+                showNoResults();
+            } finally {
+                isSearching = false;
+                updateSearchButton(false);
+            }
+        }
+
+        function updateSearchButton(searching) {
+            const button = document.getElementById('searchButton');
+            const buttonText = document.getElementById('buttonText');
+            
+            if (searching) {
+                button.disabled = true;
+                buttonText.innerHTML = '<div class="loading-spinner"></div>SCANNING...';
+            } else {
+                button.disabled = false;
+                buttonText.innerHTML = `
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    SEARCH
+                `;
+            }
+        }
+
+        function hideResults() {
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('noResults').style.display = 'none';
+        }
+
+        function showResults(results, query) {
+            const container = document.getElementById('resultsContainer');
+            const header = document.getElementById('resultsHeader');
+            const list = document.getElementById('resultsList');
+            
+            header.textContent = `MENEMUKAN ${results.length} HASIL DI RUANG DIGITAL`;
+            
+            list.innerHTML = results.map(result => `
+                <div class="result-card">
+                    <div class="result-content">
+                        <div class="result-bullet"></div>
+                        <div class="result-info">
+                            <h3 class="result-title">
+                                <a href="${result.url}" target="_blank" rel="noopener noreferrer">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+                                    </svg>
+                                    ${result.name}
+                                </a>
+                            </h3>
+                            <div class="result-url">${result.url}</div>
+                            <div class="result-snippet">${result.snippet}</div>
+                            <div class="result-meta">
+                                <span>${result.host_name}</span>
+                                <span>•</span>
+                                <span>${result.date}</span>
                             </div>
                         </div>
-                    `;
-                    
-                    container.appendChild(card);
-                });
-                
-                // Tambahkan event listener untuk tombol tambah ke keranjang
-                const addToCartButtons = document.querySelectorAll('.add-to-cart');
-                addToCartButtons.forEach(button => {
-                    button.addEventListener('click', function() {
-                        showNotification();
-                    });
-                });
-            }
+                    </div>
+                </div>
+            `).join('');
             
-            // Fungsi untuk menampilkan notifikasi
-            function showNotification() {
-                const notification = document.getElementById('notification');
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
+            container.style.display = 'block';
+        }
+
+        function showNoResults() {
+            document.getElementById('noResults').style.display = 'block';
+        }
+
+        // Simulasi fungsi pencarian
+        async function simulateSearch(query) {
+            // Simulasi delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
             
-            // Filter functionality
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Hapus class active dari semua tombol
-                    filterButtons.forEach(btn => btn.classList.remove('active'));
-                    
-                    // Tambahkan class active ke tombol yang diklik
-                    this.classList.add('active');
-                    
-                    // Filter produk (ini hanya simulasi, implementasi sebenarnya memerlukan data yang lebih lengkap)
-                    const filter = this.getAttribute('data-filter');
-                    const productCards = document.querySelectorAll('.product-card');
-                    
-                    productCards.forEach(card => {
-                        const badge = card.querySelector('.product-badge').textContent.toLowerCase();
-                        
-                        if (filter === 'all' || 
-                            (filter === 'new' && badge === 'baru') || 
-                            (filter === 'sale' && badge === 'promo') || 
-                            (filter === 'popular' && badge === 'populer')) {
-                            card.style.display = 'flex';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            
-            // Search functionality
-            const searchInput = document.getElementById('searchInput');
-            const searchBtn = document.getElementById('searchBtn');
-            
-            function performSearch() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const productCards = document.querySelectorAll('.product-card');
-                
-                productCards.forEach(card => {
-                    const productName = card.querySelector('.product-name').textContent.toLowerCase();
-                    
-                    if (productName.includes(searchTerm)) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-            
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') {
-                    performSearch();
+            // Data contoh
+            const mockResults = [
+                {
+                    name: `${query} - Hasil Pencarian 1`,
+                    url: `https://example.com/${query}`,
+                    snippet: `Ini adalah hasil pencarian untuk "${query}" dengan deskripsi yang relevan dan informatif tentang topik yang Anda cari.`,
+                    host_name: "example.com",
+                    date: "2024"
+                },
+                {
+                    name: `${query} - Informasi Lengkap`,
+                    url: `https://info.com/${query}`,
+                    snippet: `Temukan informasi lengkap tentang ${query} di sini. Kami menyediakan data yang akurat dan terpercaya.`,
+                    host_name: "info.com",
+                    date: "2024"
+                },
+                {
+                    name: `Panduan ${query} untuk Pemula`,
+                    url: `https://guide.com/${query}`,
+                    snippet: `Panduan lengkap untuk memahami ${query} dari dasar hingga tingkat lanjut. Cocok untuk pemula.`,
+                    host_name: "guide.com",
+                    date: "2024"
                 }
+            ];
+            
+            // Simulasi random hasil
+            const hasResults = Math.random() > 0.2;
+            
+            if (hasResults) {
+                showResults(mockResults, query);
+            } else {
+                showNoResults();
+            }
+        }
+
+        // Fungsi untuk implementasi API nyata (jika diperlukan)
+        async function performRealSearch(query) {
+            const response = await fetch('/api/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query }),
             });
-        });
+            
+            if (!response.ok) {
+                throw new Error('Search failed');
+            }
+            
+            const data = await response.json();
+            return data.results || [];
+        }
     </script>
 </body>
 </html>
