@@ -3,658 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBERSEARCH - Mesin Pencari Cyberpunk</title>
+    <title>CyberSearch 2077</title>
     <style>
+        :root {
+            --neon-cyan: #0ff;
+            --neon-purple: #f0f;
+            --neon-pink: #ff1493;
+            --dark-bg: #0a0a12;
+            --grid-color: rgba(0, 255, 255, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Courier New', monospace;
         }
 
         body {
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #06b6d4;
+            background-color: var(--dark-bg);
+            color: var(--neon-cyan);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
         }
 
         /* Background Grid */
-        .bg-grid {
+        .grid-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, #000 50%, rgba(6, 182, 212, 0.1) 100%);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .bg-grid::before {
-            content: '';
-            position: absolute;
-            inset: 0;
             background-image: 
-                linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 50px 50px;
-        }
-
-        /* Glitch Effect */
-        @keyframes glitch {
-            0%, 100% {
-                text-shadow: 
-                    0.05em 0 0 rgba(255, 0, 0, 0.75),
-                    -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-                    0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-            }
-            15% {
-                text-shadow: 
-                    -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-                    0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-                    -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-            }
-            50% {
-                text-shadow: 
-                    0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-                    0.05em 0 0 rgba(0, 255, 0, 0.75),
-                    0 -0.05em 0 rgba(0, 0, 255, 0.75);
-            }
-        }
-
-        /* Neon Flicker */
-        @keyframes neon-flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-                opacity: 1;
-            }
-            20%, 22%, 24%, 55% {
-                opacity: 0.5;
-            }
+            z-index: -1;
+            opacity: 0.3;
         }
 
         /* Scanline Effect */
-        @keyframes scanline {
-            0% {
-                transform: translateY(-100%);
-            }
-            100% {
-                transform: translateY(100%);
-            }
-        }
-
-        .glitch {
-            animation: glitch 2.5s infinite;
-        }
-
-        .neon-flicker {
-            animation: neon-flicker 1.5s infinite;
-        }
-
         .scanline {
-            position: relative;
-        }
-
-        .scanline::before {
-            content: "";
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent);
-            animation: scanline 8s linear infinite;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.03) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            z-index: 100;
             pointer-events: none;
+            animation: scanline 8s linear infinite;
         }
 
-        /* Main Container */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* Container */
         .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
             position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+            z-index: 1;
         }
 
         /* Header */
         .header {
             text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
+            margin-bottom: 2rem;
             position: relative;
-        }
-
-        .icon-cpu {
-            color: #06b6d4;
-            animation: pulse 2s infinite;
-        }
-
-        .icon-globe {
-            color: #a855f7;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        .icon-glow {
-            position: absolute;
-            inset: 0;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            filter: blur(20px);
-            animation: pulse 2s infinite;
-        }
-
-        .cpu-glow {
-            background: rgba(6, 182, 212, 0.2);
-        }
-
-        .globe-glow {
-            background: rgba(168, 85, 247, 0.2);
         }
 
         .title {
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: bold;
-            background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0;
-            letter-spacing: 2px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            animation: glitch 5s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            5% { transform: translate(-2px, 2px); }
+            10% { transform: translate(-2px, -2px); }
+            15% { transform: translate(2px, 2px); }
+            20% { transform: translate(2px, -2px); }
+            50% { transform: translate(0); }
         }
 
         .subtitle {
-            color: rgba(6, 182, 212, 0.7);
-            font-size: 1.125rem;
-            margin-top: 16px;
+            font-size: 1.2rem;
+            color: var(--neon-purple);
+            margin-bottom: 2rem;
         }
 
-        /* Search Form */
-        .search-form {
-            width: 100%;
-            max-width: 672px;
-            margin-bottom: 32px;
+        /* Search Area */
+        .search-area {
+            background: rgba(10, 10, 18, 0.8);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
         }
 
-        .search-container {
-            position: relative;
-            group: true;
-        }
-
-        .search-glow {
-            position: absolute;
-            inset: -4px;
-            background: linear-gradient(90deg, #0891b2, #a855f7);
-            border-radius: 8px;
-            filter: blur(12px);
-            opacity: 0.75;
-            animation: pulse 2s infinite;
-        }
-
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            gap: 8px;
+        .search-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            color: var(--neon-pink);
         }
 
         .search-input {
-            flex: 1;
+            width: 100%;
             background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(6, 182, 212, 0.5);
-            color: #06b6d4;
-            font-family: 'Courier New', monospace;
-            font-size: 1.125rem;
-            padding: 16px 24px;
-            border-radius: 8px;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-        }
-
-        .search-input::placeholder {
-            color: rgba(6, 182, 212, 0.5);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 0.8rem;
+            font-size: 1.1rem;
+            border-radius: 3px;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #06b6d4;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        .search-button {
-            background: linear-gradient(90deg, #0891b2, #a855f7);
-            color: #000;
-            font-weight: bold;
-            padding: 16px 32px;
+        .search-btn {
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+            color: black;
             border: none;
-            border-radius: 8px;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 3px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .search-button:hover {
-            background: linear-gradient(90deg, #06b6d4, #9333ea);
+        .search-btn:hover {
+            box-shadow: 0 0 15px var(--neon-cyan), 0 0 25px var(--neon-purple);
             transform: scale(1.05);
         }
 
-        .search-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+        /* Response Area */
+        .response-area {
+            background: rgba(10, 10, 18, 0.8);
+            border: 1px solid var(--neon-purple);
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            min-height: 100px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(240, 0, 255, 0.3);
         }
 
-        .loading-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #000;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Results */
-        .results-container {
-            width: 100%;
-            max-width: 896px;
-        }
-
-        .results-header {
-            color: rgba(6, 182, 212, 0.7);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 16px;
-        }
-
-        .result-card {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 16px;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-        }
-
-        .result-card:hover {
-            border-color: rgba(6, 182, 212, 0.5);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
-        }
-
-        .result-content {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-        }
-
-        .result-bullet {
-            width: 8px;
-            height: 8px;
-            background: #06b6d4;
-            border-radius: 50%;
-            margin-top: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        .result-info {
-            flex: 1;
-        }
-
-        .result-title {
-            color: #67e8f9;
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .result-title a {
-            color: inherit;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .result-title a:hover {
-            color: #a5f3fc;
-        }
-
-        .result-url {
-            color: rgba(6, 182, 212, 0.6);
-            font-size: 0.875rem;
-            margin-bottom: 8px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .result-snippet {
-            color: rgba(6, 182, 212, 0.8);
+        .response-text {
+            font-size: 1.1rem;
             line-height: 1.5;
         }
 
-        .result-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-top: 12px;
-            font-size: 0.75rem;
-            color: rgba(6, 182, 212, 0.5);
+        .loading {
+            display: none;
+            color: var(--neon-pink);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: blink 1s infinite;
         }
 
-        .no-results {
-            text-align: center;
-            padding: 48px 0;
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
-        .no-results-title {
-            color: rgba(6, 182, 212, 0.5);
-            font-size: 1.125rem;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 8px;
+        /* Results Area */
+        .results-area {
+            display: none;
+            background: rgba(10, 10, 18, 0.8);
+            border: 1px solid var(--neon-pink);
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.3);
         }
 
-        .no-results-subtitle {
-            color: rgba(6, 182, 212, 0.3);
-            font-size: 0.875rem;
-            font-family: 'Courier New', monospace;
+        .results-title {
+            font-size: 1.5rem;
+            color: var(--neon-pink);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .result-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 3px solid var(--neon-cyan);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .result-menu {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        .result-info {
+            color: #fff;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            background: rgba(0, 255, 255, 0.2);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+            padding: 0.3rem 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--neon-cyan);
+            color: black;
         }
 
         /* Footer */
         .footer {
-            position: absolute;
-            bottom: 16px;
-            left: 0;
-            right: 0;
             text-align: center;
-        }
-
-        .footer-text {
-            color: rgba(6, 182, 212, 0.3);
-            font-size: 0.75rem;
-            font-family: 'Courier New', monospace;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
             .title {
-                font-size: 3rem;
+                font-size: 2rem;
             }
             
-            .search-wrapper {
-                flex-direction: column;
+            .search-area, .response-area, .results-area {
+                padding: 1rem;
             }
-            
-            .search-button {
-                width: 100%;
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(6, 182, 212, 0.6), rgba(168, 85, 247, 0.6));
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(6, 182, 212, 0.8), rgba(168, 85, 247, 0.8));
         }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
+    <div class="grid-bg"></div>
+    <div class="scanline"></div>
     
-    <div class="container scanline">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo-container">
-                <div class="icon">
-                    <svg class="icon-cpu" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm7 0h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
-                    </svg>
-                    <div class="icon-glow cpu-glow"></div>
-                </div>
-                <h1 class="title glitch">CYBERSEARCH</h1>
-                <div class="icon">
-                    <svg class="icon-globe" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                    </svg>
-                    <div class="icon-glow globe-glow"></div>
-                </div>
-            </div>
-            <p class="subtitle neon-flicker">// AKSES FRONTIER DIGITAL //</p>
-        </header>
-
-        <!-- Search Form -->
-        <form class="search-form" onsubmit="handleSearch(event)">
-            <div class="search-container">
-                <div class="search-glow"></div>
-                <div class="search-wrapper">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="searchInput"
-                        placeholder="INISIASI PROTOCOL PENCARIAN..."
-                        required
-                    >
-                    <button type="submit" class="search-button" id="searchButton">
-                        <span id="buttonText">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
-                            SEARCH
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        <!-- Results Container -->
-        <div class="results-container" id="resultsContainer" style="display: none;">
-            <div class="results-header" id="resultsHeader"></div>
-            <div id="resultsList"></div>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">CyberSearch</h1>
+            <p class="subtitle">SYSTEM INITIALIZED - READY FOR QUERY</p>
         </div>
-
-        <!-- No Results -->
-        <div class="no-results" id="noResults" style="display: none;">
-            <div class="no-results-title">TIDAK ADA DATA YANG DITEMUKAN DALAM MATRIX</div>
-            <div class="no-results-subtitle">COBA PARAMETER PENCARIAN YANG BERBEDA</div>
+        
+        <div class="search-area">
+            <label for="search-input" class="search-label">INITIATE SEARCH PROTOCOL:</label>
+            <input type="text" id="search-input" class="search-input" placeholder="Ketik 'saya daniel' untuk memulai...">
+            <button id="search-btn" class="search-btn">Execute Search</button>
         </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p class="footer-text">&lt; CYBERSEARCH ENGINE v2.0.77 &gt;</p>
-        </footer>
+        
+        <div class="response-area">
+            <div id="response-text" class="response-text">System standby. Awaiting authentication...</div>
+            <div id="loading" class="loading">SCANNING...</div>
+        </div>
+        
+        <div id="results-area" class="results-area">
+            <h2 class="results-title">Search Results</h2>
+            <div id="results-container"></div>
+        </div>
+        
+        <div class="footer">
+            <p>CyberSearch v2.0.77 | © 2077 Cyberspace Corporation</p>
+        </div>
     </div>
 
     <script>
-        let isSearching = false;
+        // Data simulasi dari spreadsheet (dalam implementasi nyata, ini akan diambil dari API)
+        const sheetData = {
+            "sheet1": [
+                { menu: "Menu Utama", info: "Ini adalah informasi untuk menu utama" },
+                { menu: "Produk", info: "Berisi daftar produk yang tersedia" },
+                { menu: "Layanan", info: "Informasi tentang layanan yang kami sediakan" },
+                { menu: "Kontak", info: "Cara menghubungi kami" }
+            ],
+            "sheet2": [
+                { menu: "Profil Perusahaan", info: "Sejarah dan visi misi perusahaan" },
+                { menu: "Tim Kami", info: "Anggota tim dan peran mereka" },
+                { menu: "Portofolio", info: "Proyek-proyek yang telah diselesaikan" }
+            ],
+            "sheet3": [
+                { menu: "FAQ", info: "Pertanyaan yang sering diajukan" },
+                { menu: "Bantuan", info: "Panduan penggunaan sistem" },
+                { menu: "Update", info: "Pembaruan terbaru sistem" }
+            ]
+        };
 
-        async function handleSearch(event) {
-            event.preventDefault();
-            
-            if (isSearching) return;
-            
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
+        // Elemen DOM
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const responseText = document.getElementById('response-text');
+        const loading = document.getElementById('loading');
+        const resultsArea = document.getElementById('results-area');
+        const resultsContainer = document.getElementById('results-container');
 
-            isSearching = true;
-            updateSearchButton(true);
-            hideResults();
+        // Status pencarian
+        let authenticated = false;
 
-            try {
-                // Simulasi pencarian (ganti dengan API endpoint yang sesuai)
-                await simulateSearch(query);
-                
-                // Untuk implementasi nyata, gunakan:
-                // const results = await performRealSearch(query);
-                // displayResults(results, query);
-                
-            } catch (error) {
-                console.error('Search failed:', error);
-                showNoResults();
-            } finally {
-                isSearching = false;
-                updateSearchButton(false);
-            }
+        // Fungsi untuk menampilkan respons
+        function showResponse(message, delay = 0) {
+            setTimeout(() => {
+                responseText.textContent = message;
+            }, delay);
         }
 
-        function updateSearchButton(searching) {
-            const button = document.getElementById('searchButton');
-            const buttonText = document.getElementById('buttonText');
-            
-            if (searching) {
-                button.disabled = true;
-                buttonText.innerHTML = '<div class="loading-spinner"></div>SCANNING...';
-            } else {
-                button.disabled = false;
-                buttonText.innerHTML = `
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
-                    SEARCH
-                `;
-            }
+        // Fungsi untuk menampilkan loading
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+            responseText.style.display = show ? 'none' : 'block';
         }
 
-        function hideResults() {
-            document.getElementById('resultsContainer').style.display = 'none';
-            document.getElementById('noResults').style.display = 'none';
-        }
-
-        function showResults(results, query) {
-            const container = document.getElementById('resultsContainer');
-            const header = document.getElementById('resultsHeader');
-            const list = document.getElementById('resultsList');
+        // Fungsi untuk mencari data
+        function searchData(query) {
+            // Simulasi pencarian di semua sheet
+            const results = [];
             
-            header.textContent = `MENEMUKAN ${results.length} HASIL DI RUANG DIGITAL`;
-            
-            list.innerHTML = results.map(result => `
-                <div class="result-card">
-                    <div class="result-content">
-                        <div class="result-bullet"></div>
-                        <div class="result-info">
-                            <h3 class="result-title">
-                                <a href="${result.url}" target="_blank" rel="noopener noreferrer">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
-                                    </svg>
-                                    ${result.name}
-                                </a>
-                            </h3>
-                            <div class="result-url">${result.url}</div>
-                            <div class="result-snippet">${result.snippet}</div>
-                            <div class="result-meta">
-                                <span>${result.host_name}</span>
-                                <span>•</span>
-                                <span>${result.date}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-            container.style.display = 'block';
-        }
-
-        function showNoResults() {
-            document.getElementById('noResults').style.display = 'block';
-        }
-
-        // Simulasi fungsi pencarian
-        async function simulateSearch(query) {
-            // Simulasi delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Data contoh
-            const mockResults = [
-                {
-                    name: `${query} - Hasil Pencarian 1`,
-                    url: `https://example.com/${query}`,
-                    snippet: `Ini adalah hasil pencarian untuk "${query}" dengan deskripsi yang relevan dan informatif tentang topik yang Anda cari.`,
-                    host_name: "example.com",
-                    date: "2024"
-                },
-                {
-                    name: `${query} - Informasi Lengkap`,
-                    url: `https://info.com/${query}`,
-                    snippet: `Temukan informasi lengkap tentang ${query} di sini. Kami menyediakan data yang akurat dan terpercaya.`,
-                    host_name: "info.com",
-                    date: "2024"
-                },
-                {
-                    name: `Panduan ${query} untuk Pemula`,
-                    url: `https://guide.com/${query}`,
-                    snippet: `Panduan lengkap untuk memahami ${query} dari dasar hingga tingkat lanjut. Cocok untuk pemula.`,
-                    host_name: "guide.com",
-                    date: "2024"
-                }
-            ];
-            
-            // Simulasi random hasil
-            const hasResults = Math.random() > 0.2;
-            
-            if (hasResults) {
-                showResults(mockResults, query);
-            } else {
-                showNoResults();
-            }
-        }
-
-        // Fungsi untuk implementasi API nyata (jika diperlukan)
-        async function performRealSearch(query) {
-            const response = await fetch('/api/search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ query }),
+            Object.keys(sheetData).forEach(sheet => {
+                sheetData[sheet].forEach(item => {
+                    if (item.menu.toLowerCase().includes(query.toLowerCase())) {
+                        results.push(item);
+                    }
+                });
             });
             
-            if (!response.ok) {
-                throw new Error('Search failed');
+            return results;
+        }
+
+        // Fungsi untuk menampilkan hasil
+        function displayResults(results) {
+            resultsContainer.innerHTML = '';
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="result-item">No matches found in database.</div>';
+                return;
             }
             
-            const data = await response.json();
-            return data.results || [];
+            results.forEach(item => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+                resultItem.innerHTML = `
+                    <div class="result-menu">${item.menu}</div>
+                    <div class="result-info">${item.info}</div>
+                    <button class="copy-btn" data-text="${item.info}">Copy Info</button>
+                `;
+                resultsContainer.appendChild(resultItem);
+            });
+            
+            // Tambahkan event listener untuk tombol copy
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const text = this.getAttribute('data-text');
+                    navigator.clipboard.writeText(text).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                        }, 2000);
+                    });
+                });
+            });
         }
+
+        // Event listener untuk tombol pencarian
+        searchBtn.addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            
+            if (!authenticated) {
+                if (query.toLowerCase() === 'saya daniel') {
+                    authenticated = true;
+                    showResponse('Hallo, Sedang mencari apa pak');
+                    searchInput.value = '';
+                    searchInput.placeholder = 'Masukkan kata kunci pencarian...';
+                } else {
+                    showResponse('Akses ditolak. Harap verifikasi identitas dengan mengetik "saya daniel"');
+                }
+                return;
+            }
+            
+            // Jika sudah terautentikasi, lakukan pencarian
+            if (query) {
+                showLoading(true);
+                
+                // Simulasi waktu pencarian
+                setTimeout(() => {
+                    showLoading(false);
+                    const results = searchData(query);
+                    displayResults(results);
+                    resultsArea.style.display = 'block';
+                    
+                    if (results.length > 0) {
+                        showResponse(`Ditemukan ${results.length} hasil untuk "${query}"`);
+                    } else {
+                        showResponse(`Tidak ada hasil untuk "${query}"`);
+                    }
+                }, 1500);
+            } else {
+                showResponse('Harap masukkan kata kunci pencarian');
+            }
+        });
+
+        // Event listener untuk menekan Enter di input
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBtn.click();
+            }
+        });
+
+        // Efek glitch acak pada judul
+        setInterval(() => {
+            const title = document.querySelector('.title');
+            title.style.animation = 'none';
+            setTimeout(() => {
+                title.style.animation = 'glitch 5s infinite';
+            }, 10);
+        }, 10000);
     </script>
 </body>
 </html>
