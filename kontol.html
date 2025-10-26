@@ -1,660 +1,2149 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBERSEARCH - Mesin Pencari Cyberpunk</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 
-        body {
-            font-family: 'Courier New', monospace;
-            background: #000;
-            color: #06b6d4;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
+// Context untuk manajemen state global
+const AppContext = createContext();
 
-        /* Background Grid */
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, #000 50%, rgba(6, 182, 212, 0.1) 100%);
-            pointer-events: none;
-            z-index: 1;
-        }
+// Data produk mock
+const initialProducts = [
+  {
+    id: 1,
+    name: "Nike Air Max 270",
+    brand: "Nike",
+    price: 1500000,
+    originalPrice: 1800000,
+    sizes: [38, 39, 40, 41, 42, 43, 44],
+    category: "Running",
+    image: "https://picsum.photos/seed/nike270/400/300",
+    description: "Sepatu running dengan teknologi Air Max untuk kenyamanan maksimal",
+    stock: { 38: 5, 39: 8, 40: 10, 41: 7, 42: 5, 43: 3, 44: 2 },
+    rating: 4.5,
+    reviews: 128,
+    isNew: true,
+    discount: 17
+  },
+  {
+    id: 2,
+    name: "Adidas Ultraboost 22",
+    brand: "Adidas",
+    price: 2200000,
+    originalPrice: 2500000,
+    sizes: [38, 39, 40, 41, 42, 43, 44],
+    category: "Running",
+    image: "https://picsum.photos/seed/ultraboost/400/300",
+    description: "Sepatu premium dengan cushioning terbaik untuk jarak jauh",
+    stock: { 38: 3, 39: 6, 40: 8, 41: 10, 42: 7, 43: 5, 44: 4 },
+    rating: 4.8,
+    reviews: 256,
+    isNew: false,
+    discount: 12
+  },
+  {
+    id: 3,
+    name: "Converse Chuck Taylor",
+    brand: "Converse",
+    price: 800000,
+    originalPrice: 900000,
+    sizes: [36, 37, 38, 39, 40, 41, 42],
+    category: "Casual",
+    image: "https://picsum.photos/seed/converse/400/300",
+    description: "Klasik abadi yang cocok untuk semua gaya",
+    stock: { 36: 10, 37: 12, 38: 15, 39: 18, 40: 20, 41: 15, 42: 10 },
+    rating: 4.3,
+    reviews: 342,
+    isNew: false,
+    discount: 11
+  },
+  {
+    id: 4,
+    name: "Vans Old Skool",
+    brand: "Vans",
+    price: 950000,
+    originalPrice: 1100000,
+    sizes: [37, 38, 39, 40, 41, 42, 43],
+    category: "Skate",
+    image: "https://picsum.photos/seed/vans/400/300",
+    description: "Sepatu skate ikonik dengan desain timeless",
+    stock: { 37: 8, 38: 10, 39: 12, 40: 14, 41: 12, 42: 10, 43: 8 },
+    rating: 4.4,
+    reviews: 189,
+    isNew: false,
+    discount: 14
+  },
+  {
+    id: 5,
+    name: "New Balance 574",
+    brand: "New Balance",
+    price: 1200000,
+    originalPrice: 1400000,
+    sizes: [38, 39, 40, 41, 42, 43, 44],
+    category: "Lifestyle",
+    image: "https://picsum.photos/seed/nb574/400/300",
+    description: "Kombinasi sempurna antara retro dan modern",
+    stock: { 38: 6, 39: 8, 40: 10, 41: 12, 42: 10, 43: 8, 44: 6 },
+    rating: 4.6,
+    reviews: 167,
+    isNew: true,
+    discount: 14
+  },
+  {
+    id: 6,
+    name: "Puma RS-X³",
+    brand: "Puma",
+    price: 1350000,
+    originalPrice: 1500000,
+    sizes: [38, 39, 40, 41, 42, 43],
+    category: "Lifestyle",
+    image: "https://picsum.photos/seed/puma/400/300",
+    description: "Desain bold dengan teknologi RS untuk kenyamanan",
+    stock: { 38: 4, 39: 6, 40: 8, 41: 10, 42: 8, 43: 6 },
+    rating: 4.2,
+    reviews: 94,
+    isNew: true,
+    discount: 10
+  }
+];
 
-        .bg-grid::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-        }
+// Customer reviews data
+const customerReviews = [
+  {
+    id: 1,
+    productId: 1,
+    customerName: "Budi Santoso",
+    rating: 5,
+    comment: "Sangat nyaman dipakai untuk lari pagi. Desainnya juga keren!",
+    date: "2024-01-15",
+    verified: true
+  },
+  {
+    id: 2,
+    productId: 1,
+    customerName: "Siti Nurhaliza",
+    rating: 4,
+    comment: "Bagus, tapi ukurannya sedikit lebih besar dari biasanya",
+    date: "2024-01-10",
+    verified: true
+  },
+  {
+    id: 3,
+    productId: 2,
+    customerName: "Ahmad Fauzi",
+    rating: 5,
+    comment: "Worth the price! Kualitas premium sangat terasa",
+    date: "2024-01-08",
+    verified: true
+  }
+];
 
-        /* Glitch Effect */
-        @keyframes glitch {
-            0%, 100% {
-                text-shadow: 
-                    0.05em 0 0 rgba(255, 0, 0, 0.75),
-                    -0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-                    0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-            }
-            15% {
-                text-shadow: 
-                    -0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-                    0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
-                    -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-            }
-            50% {
-                text-shadow: 
-                    0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-                    0.05em 0 0 rgba(0, 255, 0, 0.75),
-                    0 -0.05em 0 rgba(0, 0, 255, 0.75);
-            }
-        }
+// Main App Component
+function App() {
+  const [products, setProducts] = useState(initialProducts);
+  const [cart, setCart] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [user, setUser] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [priceRange, setPriceRange] = useState([0, 3000000]);
+  const [sortBy, setSortBy] = useState('featured');
 
-        /* Neon Flicker */
-        @keyframes neon-flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-                opacity: 1;
-            }
-            20%, 22%, 24%, 55% {
-                opacity: 0.5;
-            }
-        }
+  const addToCart = (product, size, quantity) => {
+    const existingItem = cart.find(item => item.id === product.id && item.size === size);
+    if (existingItem) {
+      setCart(cart.map(item => 
+        item.id === product.id && item.size === size 
+          ? { ...item, quantity: item.quantity + quantity }
+          : item
+      ));
+    } else {
+      setCart([...cart, { ...product, size, quantity }]);
+    }
+    addNotification(`${product.name} (Size ${size}) ditambahkan ke keranjang`);
+  };
 
-        /* Scanline Effect */
-        @keyframes scanline {
-            0% {
-                transform: translateY(-100%);
-            }
-            100% {
-                transform: translateY(100%);
-            }
-        }
+  const removeFromCart = (productId, size) => {
+    setCart(cart.filter(item => !(item.id === productId && item.size === size)));
+  };
 
-        .glitch {
-            animation: glitch 2.5s infinite;
-        }
+  const updateCartQuantity = (productId, size, quantity) => {
+    if (quantity === 0) {
+      removeFromCart(productId, size);
+    } else {
+      setCart(cart.map(item => 
+        item.id === productId && item.size === size 
+          ? { ...item, quantity }
+          : item
+      ));
+    }
+  };
 
-        .neon-flicker {
-            animation: neon-flicker 1.5s infinite;
-        }
+  const addNotification = (message) => {
+    const newNotification = {
+      id: Date.now(),
+      message,
+      timestamp: new Date(),
+      read: false
+    };
+    setNotifications([newNotification, ...notifications]);
+  };
 
-        .scanline {
-            position: relative;
-        }
+  const markNotificationRead = (id) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
 
-        .scanline::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent);
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-        }
+  const placeOrder = (orderData) => {
+    const newOrder = {
+      id: Date.now(),
+      ...orderData,
+      status: 'processing',
+      createdAt: new Date(),
+      items: [...cart]
+    };
+    setOrders([...orders, newOrder]);
+    setCart([]);
+    addNotification(`Pesanan #${newOrder.id} berhasil dibuat!`);
+    return newOrder;
+  };
 
-        /* Main Container */
-        .container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+  const updateOrderStatus = (orderId, status) => {
+    setOrders(orders.map(order => 
+      order.id === orderId ? { ...order, status } : order
+    ));
+    addNotification(`Status pesanan #${orderId} diperbarui: ${status}`);
+  };
 
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .icon {
-            width: 48px;
-            height: 48px;
-            position: relative;
-        }
-
-        .icon-cpu {
-            color: #06b6d4;
-            animation: pulse 2s infinite;
-        }
-
-        .icon-globe {
-            color: #a855f7;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
-        }
-
-        .icon-glow {
-            position: absolute;
-            inset: 0;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            filter: blur(20px);
-            animation: pulse 2s infinite;
-        }
-
-        .cpu-glow {
-            background: rgba(6, 182, 212, 0.2);
-        }
-
-        .globe-glow {
-            background: rgba(168, 85, 247, 0.2);
-        }
-
-        .title {
-            font-size: 4rem;
-            font-weight: bold;
-            background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin: 0;
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-            color: rgba(6, 182, 212, 0.7);
-            font-size: 1.125rem;
-            margin-top: 16px;
-        }
-
-        /* Search Form */
-        .search-form {
-            width: 100%;
-            max-width: 672px;
-            margin-bottom: 32px;
-        }
-
-        .search-container {
-            position: relative;
-            group: true;
-        }
-
-        .search-glow {
-            position: absolute;
-            inset: -4px;
-            background: linear-gradient(90deg, #0891b2, #a855f7);
-            border-radius: 8px;
-            filter: blur(12px);
-            opacity: 0.75;
-            animation: pulse 2s infinite;
-        }
-
-        .search-wrapper {
-            position: relative;
-            display: flex;
-            gap: 8px;
-        }
-
-        .search-input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(6, 182, 212, 0.5);
-            color: #06b6d4;
-            font-family: 'Courier New', monospace;
-            font-size: 1.125rem;
-            padding: 16px 24px;
-            border-radius: 8px;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-        }
-
-        .search-input::placeholder {
-            color: rgba(6, 182, 212, 0.5);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #06b6d4;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
-        }
-
-        .search-button {
-            background: linear-gradient(90deg, #0891b2, #a855f7);
-            color: #000;
-            font-weight: bold;
-            padding: 16px 32px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Courier New', monospace;
-            font-size: 1rem;
-        }
-
-        .search-button:hover {
-            background: linear-gradient(90deg, #06b6d4, #9333ea);
-            transform: scale(1.05);
-        }
-
-        .search-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid #000;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Results */
-        .results-container {
-            width: 100%;
-            max-width: 896px;
-        }
-
-        .results-header {
-            color: rgba(6, 182, 212, 0.7);
-            font-family: 'Courier New', monospace;
-            margin-bottom: 16px;
-        }
-
-        .result-card {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            border-radius: 8px;
-            padding: 24px;
-            margin-bottom: 16px;
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
-        }
-
-        .result-card:hover {
-            border-color: rgba(6, 182, 212, 0.5);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
-        }
-
-        .result-content {
-            display: flex;
-            align-items: flex-start;
-            gap: 16px;
-        }
-
-        .result-bullet {
-            width: 8px;
-            height: 8px;
-            background: #06b6d4;
-            border-radius: 50%;
-            margin-top: 8px;
-            animation: pulse 2s infinite;
-        }
-
-        .result-info {
-            flex: 1;
-        }
-
-        .result-title {
-            color: #67e8f9;
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .result-title a {
-            color: inherit;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .result-title a:hover {
-            color: #a5f3fc;
-        }
-
-        .result-url {
-            color: rgba(6, 182, 212, 0.6);
-            font-size: 0.875rem;
-            margin-bottom: 8px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .result-snippet {
-            color: rgba(6, 182, 212, 0.8);
-            line-height: 1.5;
-        }
-
-        .result-meta {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-top: 12px;
-            font-size: 0.75rem;
-            color: rgba(6, 182, 212, 0.5);
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 48px 0;
-        }
-
-        .no-results-title {
-            color: rgba(6, 182, 212, 0.5);
-            font-size: 1.125rem;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 8px;
-        }
-
-        .no-results-subtitle {
-            color: rgba(6, 182, 212, 0.3);
-            font-size: 0.875rem;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Footer */
-        .footer {
-            position: absolute;
-            bottom: 16px;
-            left: 0;
-            right: 0;
-            text-align: center;
-        }
-
-        .footer-text {
-            color: rgba(6, 182, 212, 0.3);
-            font-size: 0.75rem;
-            font-family: 'Courier New', monospace;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .title {
-                font-size: 3rem;
-            }
-            
-            .search-wrapper {
-                flex-direction: column;
-            }
-            
-            .search-button {
-                width: 100%;
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(6, 182, 212, 0.6), rgba(168, 85, 247, 0.6));
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(6, 182, 212, 0.8), rgba(168, 85, 247, 0.8));
-        }
-    </style>
-</head>
-<body>
-    <div class="bg-grid"></div>
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesBrand = !selectedBrand || product.brand === selectedBrand;
+    const matchesSize = !selectedSize || product.sizes.includes(parseInt(selectedSize));
+    const matchesCategory = !selectedCategory || product.category === selectedCategory;
+    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
     
-    <div class="container scanline">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo-container">
-                <div class="icon">
-                    <svg class="icon-cpu" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm7 0h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
-                    </svg>
-                    <div class="icon-glow cpu-glow"></div>
-                </div>
-                <h1 class="title glitch">CYBERSEARCH</h1>
-                <div class="icon">
-                    <svg class="icon-globe" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                    </svg>
-                    <div class="icon-glow globe-glow"></div>
-                </div>
-            </div>
-            <p class="subtitle neon-flicker">// AKSES FRONTIER DIGITAL //</p>
-        </header>
+    return matchesSearch && matchesBrand && matchesSize && matchesCategory && matchesPrice;
+  }).sort((a, b) => {
+    switch(sortBy) {
+      case 'price-low': return a.price - b.price;
+      case 'price-high': return b.price - a.price;
+      case 'rating': return b.rating - a.rating;
+      case 'newest': return b.id - a.id;
+      default: return 0;
+    }
+  });
 
-        <!-- Search Form -->
-        <form class="search-form" onsubmit="handleSearch(event)">
-            <div class="search-container">
-                <div class="search-glow"></div>
-                <div class="search-wrapper">
-                    <input 
-                        type="text" 
-                        class="search-input" 
-                        id="searchInput"
-                        placeholder="INISIASI PROTOCOL PENCARIAN..."
-                        required
+  return (
+    <AppContext.Provider value={{
+      products,
+      cart,
+      orders,
+      user,
+      notifications,
+      searchQuery,
+      selectedBrand,
+      selectedSize,
+      selectedCategory,
+      priceRange,
+      sortBy,
+      filteredProducts,
+      setSearchQuery,
+      setSelectedBrand,
+      setSelectedSize,
+      setSelectedCategory,
+      setPriceRange,
+      setSortBy,
+      addToCart,
+      removeFromCart,
+      updateCartQuantity,
+      placeOrder,
+      updateOrderStatus,
+      addNotification,
+      markNotificationRead,
+      setUser
+    }}>
+      <Router>
+        <div className="min-h-screen bg-gray-50">
+          <Header />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/product/:id" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/products" element={<ProductManagement />} />
+            <Route path="/admin/orders" element={<OrderManagement />} />
+            <Route path="/admin/customers" element={<CustomerManagement />} />
+          </Routes>
+          <Footer />
+        </div>
+      </Router>
+    </AppContext.Provider>
+  );
+}
+
+// Header Component
+function Header() {
+  const { cart, notifications, user, setUser } = useContext(AppContext);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  return (
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <div className="text-2xl font-bold text-indigo-600">ShoeStore</div>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-8">
+            <Link to="/" className="text-gray-700 hover:text-indigo-600 transition">Beranda</Link>
+            <Link to="/catalog" className="text-gray-700 hover:text-indigo-600 transition">Katalog</Link>
+            <Link to="/orders" className="text-gray-700 hover:text-indigo-600 transition">Pesanan</Link>
+            {user?.role === 'admin' && (
+              <Link to="/admin" className="text-gray-700 hover:text-indigo-600 transition">Admin</Link>
+            )}
+          </nav>
+
+          {/* Right Section */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 text-gray-600 hover:text-indigo-600 transition relative"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto">
+                  <div className="p-4 border-b">
+                    <h3 className="font-semibold">Notifikasi</h3>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="p-4 text-gray-500 text-center">Tidak ada notifikasi</div>
+                  ) : (
+                    notifications.map(notif => (
+                      <div key={notif.id} className={`p-4 border-b hover:bg-gray-50 ${!notif.read ? 'bg-blue-50' : ''}`}>
+                        <p className="text-sm">{notif.message}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(notif.timestamp).toLocaleString('id-ID')}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Cart */}
+            <Link to="/cart" className="relative p-2 text-gray-600 hover:text-indigo-600 transition">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition"
+              >
+                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white">
+                  {user ? user.name[0].toUpperCase() : 'U'}
+                </div>
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
+                  {user ? (
+                    <>
+                      <div className="p-4 border-b">
+                        <p className="font-semibold">{user.name}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setUser(null);
+                          setShowUserMenu(false);
+                        }}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 text-red-600"
+                      >
+                        Keluar
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setUser({ name: 'Demo User', email: 'demo@example.com', role: 'customer' });
+                        setShowUserMenu(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-50"
                     >
-                    <button type="submit" class="search-button" id="searchButton">
-                        <span id="buttonText">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                            </svg>
-                            SEARCH
-                        </span>
+                      Masuk
                     </button>
+                  )}
                 </div>
+              )}
             </div>
-        </form>
 
-        <!-- Results Container -->
-        <div class="results-container" id="resultsContainer" style="display: none;">
-            <div class="results-header" id="resultsHeader"></div>
-            <div id="resultsList"></div>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-600"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <!-- No Results -->
-        <div class="no-results" id="noResults" style="display: none;">
-            <div class="no-results-title">TIDAK ADA DATA YANG DITEMUKAN DALAM MATRIX</div>
-            <div class="no-results-subtitle">COBA PARAMETER PENCARIAN YANG BERBEDA</div>
-        </div>
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t">
+            <nav className="py-2">
+              <Link to="/" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Beranda</Link>
+              <Link to="/catalog" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Katalog</Link>
+              <Link to="/orders" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Pesanan</Link>
+              {user?.role === 'admin' && (
+                <Link to="/admin" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Admin</Link>
+              )}
+            </nav>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p class="footer-text">&lt; CYBERSEARCH ENGINE v2.0.77 &gt;</p>
-        </footer>
+// Home Page Component
+function HomePage() {
+  const { filteredProducts, addToCart } = useContext(AppContext);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(1);
+
+  return (
+    <div>
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">Temukan Sepatu Impianmu</h1>
+            <p className="text-xl mb-8">Koleksi terbaru dengan kualitas terbaik</p>
+            <button className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+              Belanja Sekarang
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold mb-2">Pengiriman Cepat</h3>
+              <p className="text-gray-600">Gratis ongkir untuk pembelian di atas Rp 500.000</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold mb-2">Produk Original</h3>
+              <p className="text-gray-600">100% produk original dengan garansi resmi</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold mb-2">Pembayaran Aman</h3>
+              <p className="text-gray-600">Berbagai metode pembayaran yang aman dan terpercaya</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Product Catalog */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">Produk Terbaru</h2>
+          
+          {/* Filters */}
+          <ProductFilters />
+
+          {/* Product Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filteredProducts.map(product => (
+              <ProductCard 
+                key={product.id} 
+                product={product}
+                onQuickView={setSelectedProduct}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick View Modal */}
+      {selectedProduct && (
+        <QuickViewModal 
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </div>
+  );
+}
 
-    <script>
-        let isSearching = false;
+// Product Card Component
+function ProductCard({ product, onQuickView }) {
+  const { addToCart } = useContext(AppContext);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [showSizeSelector, setShowSizeSelector] = useState(false);
 
-        async function handleSearch(event) {
-            event.preventDefault();
-            
-            if (isSearching) return;
-            
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
+  const handleAddToCart = () => {
+    if (selectedSize) {
+      addToCart(product, selectedSize, 1);
+      setShowSizeSelector(false);
+    }
+  };
 
-            isSearching = true;
-            updateSearchButton(true);
-            hideResults();
+  return (
+    <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+      <div className="relative">
+        <img 
+          src={product.image} 
+          alt={product.name}
+          className="w-full h-48 object-cover rounded-t-lg"
+        />
+        {product.isNew && (
+          <span className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 text-xs rounded">
+            Baru
+          </span>
+        )}
+        {product.discount > 0 && (
+          <span className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 text-xs rounded">
+            -{product.discount}%
+          </span>
+        )}
+        <button
+          onClick={() => onQuickView(product)}
+          className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        </button>
+      </div>
+      
+      <div className="p-4">
+        <div className="text-sm text-gray-500 mb-1">{product.brand}</div>
+        <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
+        
+        <div className="flex items-center mb-2">
+          <div className="flex text-yellow-400">
+            {[...Array(5)].map((_, i) => (
+              <svg key={i} className={`w-4 h-4 ${i < Math.floor(product.rating) ? 'fill-current' : 'fill-gray-300'}`} viewBox="0 0 20 20">
+                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+              </svg>
+            ))}
+          </div>
+          <span className="text-sm text-gray-500 ml-2">({product.reviews})</span>
+        </div>
+        
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <span className="text-xl font-bold text-indigo-600">
+              Rp {product.price.toLocaleString('id-ID')}
+            </span>
+            {product.originalPrice > product.price && (
+              <span className="text-sm text-gray-500 line-through ml-2">
+                Rp {product.originalPrice.toLocaleString('id-ID')}
+              </span>
+            )}
+          </div>
+        </div>
+        
+        {!showSizeSelector ? (
+          <button
+            onClick={() => setShowSizeSelector(true)}
+            className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+          >
+            Tambah ke Keranjang
+          </button>
+        ) : (
+          <div className="space-y-2">
+            <select
+              value={selectedSize}
+              onChange={(e) => setSelectedSize(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2"
+            >
+              <option value="">Pilih Ukuran</option>
+              {product.sizes.map(size => (
+                <option key={size} value={size}>
+                  {size} {product.stock[size] < 5 && `(Sisa ${product.stock[size]})`}
+                </option>
+              ))}
+            </select>
+            <div className="flex space-x-2">
+              <button
+                onClick={handleAddToCart}
+                disabled={!selectedSize}
+                className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-300"
+              >
+                Konfirmasi
+              </button>
+              <button
+                onClick={() => setShowSizeSelector(false)}
+                className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-            try {
-                // Simulasi pencarian (ganti dengan API endpoint yang sesuai)
-                await simulateSearch(query);
-                
-                // Untuk implementasi nyata, gunakan:
-                // const results = await performRealSearch(query);
-                // displayResults(results, query);
-                
-            } catch (error) {
-                console.error('Search failed:', error);
-                showNoResults();
-            } finally {
-                isSearching = false;
-                updateSearchButton(false);
-            }
-        }
+// Product Filters Component
+function ProductFilters() {
+  const {
+    searchQuery,
+    selectedBrand,
+    selectedSize,
+    selectedCategory,
+    priceRange,
+    sortBy,
+    setSearchQuery,
+    setSelectedBrand,
+    setSelectedSize,
+    setSelectedCategory,
+    setPriceRange,
+    setSortBy,
+    products
+  } = useContext(AppContext);
 
-        function updateSearchButton(searching) {
-            const button = document.getElementById('searchButton');
-            const buttonText = document.getElementById('buttonText');
-            
-            if (searching) {
-                button.disabled = true;
-                buttonText.innerHTML = '<div class="loading-spinner"></div>SCANNING...';
-            } else {
-                button.disabled = false;
-                buttonText.innerHTML = `
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+  const brands = [...new Set(products.map(p => p.brand))];
+  const categories = [...new Set(products.map(p => p.category))];
+  const allSizes = [...new Set(products.flatMap(p => p.sizes))].sort((a, b) => a - b);
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        {/* Search */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Cari Produk</label>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Nama atau merek..."
+            className="w-full border rounded-lg px-3 py-2"
+          />
+        </div>
+
+        {/* Brand Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Merek</label>
+          <select
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2"
+          >
+            <option value="">Semua Merek</option>
+            {brands.map(brand => (
+              <option key={brand} value={brand}>{brand}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Size Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Ukuran</label>
+          <select
+            value={selectedSize}
+            onChange={(e) => setSelectedSize(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2"
+          >
+            <option value="">Semua Ukuran</option>
+            {allSizes.map(size => (
+              <option key={size} value={size}>{size}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Category Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2"
+          >
+            <option value="">Semua Kategori</option>
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Price Range */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Rentang Harga</label>
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={priceRange[0]}
+              onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+              placeholder="Min"
+              className="w-full border rounded-lg px-2 py-2 text-sm"
+            />
+            <input
+              type="number"
+              value={priceRange[1]}
+              onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+              placeholder="Max"
+              className="w-full border rounded-lg px-2 py-2 text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Sort */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Urutkan</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2"
+          >
+            <option value="featured">Unggulan</option>
+            <option value="price-low">Harga Terendah</option>
+            <option value="price-high">Harga Tertinggi</option>
+            <option value="rating">Rating Tertinggi</option>
+            <option value="newest">Terbaru</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Quick View Modal
+function QuickViewModal({ product, onClose }) {
+  const { addToCart } = useContext(AppContext);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState('description');
+
+  const handleAddToCart = () => {
+    if (selectedSize) {
+      addToCart(product, selectedSize, quantity);
+      onClose();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-2xl font-bold">{product.name}</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <img 
+                src={product.image} 
+                alt={product.name}
+                className="w-full rounded-lg"
+              />
+            </div>
+
+            <div>
+              <div className="text-sm text-gray-500 mb-2">{product.brand}</div>
+              
+              <div className="flex items-center mb-4">
+                <div className="flex text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'fill-current' : 'fill-gray-300'}`} viewBox="0 0 20 20">
+                      <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
                     </svg>
-                    SEARCH
-                `;
-            }
-        }
-
-        function hideResults() {
-            document.getElementById('resultsContainer').style.display = 'none';
-            document.getElementById('noResults').style.display = 'none';
-        }
-
-        function showResults(results, query) {
-            const container = document.getElementById('resultsContainer');
-            const header = document.getElementById('resultsHeader');
-            const list = document.getElementById('resultsList');
-            
-            header.textContent = `MENEMUKAN ${results.length} HASIL DI RUANG DIGITAL`;
-            
-            list.innerHTML = results.map(result => `
-                <div class="result-card">
-                    <div class="result-content">
-                        <div class="result-bullet"></div>
-                        <div class="result-info">
-                            <h3 class="result-title">
-                                <a href="${result.url}" target="_blank" rel="noopener noreferrer">
-                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
-                                    </svg>
-                                    ${result.name}
-                                </a>
-                            </h3>
-                            <div class="result-url">${result.url}</div>
-                            <div class="result-snippet">${result.snippet}</div>
-                            <div class="result-meta">
-                                <span>${result.host_name}</span>
-                                <span>•</span>
-                                <span>${result.date}</span>
-                            </div>
-                        </div>
-                    </div>
+                  ))}
                 </div>
-            `).join('');
-            
-            container.style.display = 'block';
-        }
+                <span className="ml-2 text-gray-600">{product.rating} ({product.reviews} ulasan)</span>
+              </div>
 
-        function showNoResults() {
-            document.getElementById('noResults').style.display = 'block';
-        }
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-indigo-600">
+                  Rp {product.price.toLocaleString('id-ID')}
+                </span>
+                {product.originalPrice > product.price && (
+                  <span className="text-lg text-gray-500 line-through ml-2">
+                    Rp {product.originalPrice.toLocaleString('id-ID')}
+                  </span>
+                )}
+              </div>
 
-        // Simulasi fungsi pencarian
-        async function simulateSearch(query) {
-            // Simulasi delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Data contoh
-            const mockResults = [
-                {
-                    name: `${query} - Hasil Pencarian 1`,
-                    url: `https://example.com/${query}`,
-                    snippet: `Ini adalah hasil pencarian untuk "${query}" dengan deskripsi yang relevan dan informatif tentang topik yang Anda cari.`,
-                    host_name: "example.com",
-                    date: "2024"
-                },
-                {
-                    name: `${query} - Informasi Lengkap`,
-                    url: `https://info.com/${query}`,
-                    snippet: `Temukan informasi lengkap tentang ${query} di sini. Kami menyediakan data yang akurat dan terpercaya.`,
-                    host_name: "info.com",
-                    date: "2024"
-                },
-                {
-                    name: `Panduan ${query} untuk Pemula`,
-                    url: `https://guide.com/${query}`,
-                    snippet: `Panduan lengkap untuk memahami ${query} dari dasar hingga tingkat lanjut. Cocok untuk pemula.`,
-                    host_name: "guide.com",
-                    date: "2024"
-                }
-            ];
-            
-            // Simulasi random hasil
-            const hasResults = Math.random() > 0.2;
-            
-            if (hasResults) {
-                showResults(mockResults, query);
-            } else {
-                showNoResults();
-            }
-        }
+              {/* Tabs */}
+              <div className="border-b mb-4">
+                <div className="flex space-x-4">
+                  <button
+                    onClick={() => setActiveTab('description')}
+                    className={`pb-2 ${activeTab === 'description' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-600'}`}
+                  >
+                    Deskripsi
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('reviews')}
+                    className={`pb-2 ${activeTab === 'reviews' ? 'border-b-2 border-indigo-600 text-indigo-600' : 'text-gray-600'}`}
+                  >
+                    Ulasan
+                  </button>
+                </div>
+              </div>
 
-        // Fungsi untuk implementasi API nyata (jika diperlukan)
-        async function performRealSearch(query) {
-            const response = await fetch('/api/search', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ query }),
-            });
+              {activeTab === 'description' ? (
+                <div>
+                  <p className="text-gray-700 mb-4">{product.description}</p>
+                  <div className="mb-4">
+                    <h4 className="font-semibold mb-2">Ukuran Tersedia:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {product.sizes.map(size => (
+                        <button
+                          key={size}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-4 py-2 border rounded-lg ${
+                            selectedSize === size 
+                              ? 'bg-indigo-600 text-white border-indigo-600' 
+                              : 'hover:border-indigo-600'
+                          }`}
+                          disabled={product.stock[size] === 0}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {customerReviews
+                    .filter(r => r.productId === product.id)
+                    .map(review => (
+                      <div key={review.id} className="border-b pb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold">{review.customerName}</span>
+                          <div className="flex text-yellow-400">
+                            {[...Array(5)].map((_, i) => (
+                              <svg key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'fill-gray-300'}`} viewBox="0 0 20 20">
+                                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-gray-700 text-sm">{review.comment}</p>
+                        <p className="text-xs text-gray-500 mt-1">{review.date}</p>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              <div className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah</label>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-1 border rounded-lg hover:bg-gray-50"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      value={quantity}
+                      onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                      className="w-20 text-center border rounded-lg px-2 py-1"
+                    />
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-1 border rounded-lg hover:bg-gray-50"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!selectedSize}
+                  className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-300"
+                >
+                  Tambah ke Keranjang
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Product Detail Page
+function ProductDetailPage() {
+  const { products } = useContext(AppContext);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const product = products.find(p => p.id === parseInt(id));
+
+  if (!product) {
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold mb-4">Produk tidak ditemukan</h2>
+        <button
+          onClick={() => navigate('/')}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700"
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Product Images */}
+        <div>
+          <img 
+            src={product.image} 
+            alt={product.name}
+            className="w-full rounded-lg shadow-lg"
+          />
+          <div className="grid grid-cols-4 gap-2 mt-4">
+            {[1, 2, 3, 4].map(i => (
+              <img 
+                key={i}
+                src={`https://picsum.photos/seed/${product.name}${i}/100/100`}
+                alt={`${product.name} ${i}`}
+                className="w-full rounded cursor-pointer hover:opacity-75"
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Product Info */}
+        <div>
+          <div className="text-sm text-gray-500 mb-2">{product.brand}</div>
+          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+          
+          <div className="flex items-center mb-4">
+            <div className="flex text-yellow-400">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'fill-current' : 'fill-gray-300'}`} viewBox="0 0 20 20">
+                  <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                </svg>
+              ))}
+            </div>
+            <span className="ml-2 text-gray-600">{product.rating} ({product.reviews} ulasan)</span>
+          </div>
+
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-indigo-600">
+              Rp {product.price.toLocaleString('id-ID')}
+            </span>
+            {product.originalPrice > product.price && (
+              <span className="text-xl text-gray-500 line-through ml-2">
+                Rp {product.originalPrice.toLocaleString('id-ID')}
+              </span>
+            )}
+          </div>
+
+          <p className="text-gray-700 mb-6">{product.description}</p>
+
+          {/* Size Selection */}
+          <div className="mb-6">
+            <h3 className="font-semibold mb-3">Pilih Ukuran:</h3>
+            <div className="grid grid-cols-4 gap-2">
+              {product.sizes.map(size => (
+                <button
+                  key={size}
+                  className="py-2 border rounded-lg hover:border-indigo-600 hover:bg-indigo-50"
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Add to Cart */}
+          <div className="flex space-x-4 mb-6">
+            <button className="flex-1 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition">
+              Tambah ke Keranjang
+            </button>
+            <button className="px-6 py-3 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Product Details */}
+          <div className="border-t pt-6">
+            <h3 className="font-semibold mb-3">Detail Produk:</h3>
+            <ul className="space-y-2 text-gray-600">
+              <li>• Kategori: {product.category}</li>
+              <li>• Merek: {product.brand}</li>
+              <li>• Garansi: 1 Tahun</li>
+              <li>• Pengiriman: 1-3 hari kerja</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Ulasan Pelanggan</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {customerReviews
+            .filter(r => r.productId === product.id)
+            .map(review => (
+              <div key={review.id} className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <div className="font-semibold">{review.customerName}</div>
+                    <div className="flex text-yellow-400 text-sm">
+                      {[...Array(5)].map((_, i) => (
+                        <svg key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-current' : 'fill-gray-300'}`} viewBox="0 0 20 20">
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500">{review.date}</span>
+                </div>
+                <p className="text-gray-700">{review.comment}</p>
+                {review.verified && (
+                  <div className="mt-2 text-sm text-green-600 flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Pembelian Terverifikasi
+                  </div>
+                )}
+              </div>
+            ))}
+        </div>
+      </div>
+
+      {/* Similar Products */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold mb-6">Produk Serupa</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {products
+            .filter(p => p.category === product.category && p.id !== product.id)
+            .slice(0, 4)
+            .map(p => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Cart Page
+function CartPage() {
+  const { cart, removeFromCart, updateCartQuantity } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shipping = subtotal > 500000 ? 0 : 20000;
+  const total = subtotal + shipping;
+
+  if (cart.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <svg className="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+        <h2 className="text-2xl font-bold mb-4">Keranjang Belanja Kosong</h2>
+        <p className="text-gray-600 mb-6">Belum ada produk di keranjang Anda</p>
+        <button
+          onClick={() => navigate('/')}
+          className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition"
+        >
+          Mulai Belanja
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Keranjang Belanja</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Cart Items */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-md">
+            {cart.map((item, index) => (
+              <div key={`${item.id}-${item.size}`} className={`p-6 ${index !== cart.length - 1 ? 'border-b' : ''}`}>
+                <div className="flex items-center space-x-4">
+                  <img 
+                    src={item.image} 
+                    alt={item.name}
+                    className="w-24 h-24 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg">{item.name}</h3>
+                    <p className="text-gray-600">Merek: {item.brand}</p>
+                    <p className="text-gray-600">Ukuran: {item.size}</p>
+                    <p className="text-indigo-600 font-semibold mt-2">
+                      Rp {item.price.toLocaleString('id-ID')}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => updateCartQuantity(item.id, item.size, item.quantity - 1)}
+                        className="w-8 h-8 border rounded hover:bg-gray-100"
+                      >
+                        -
+                      </button>
+                      <span className="w-12 text-center">{item.quantity}</span>
+                      <button
+                        onClick={() => updateCartQuantity(item.id, item.size, item.quantity + 1)}
+                        className="w-8 h-8 border rounded hover:bg-gray-100"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => removeFromCart(item.id, item.size)}
+                      className="text-red-600 hover:text-red-700 text-sm"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Order Summary */}
+        <div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Ringkasan Pesanan</h2>
             
-            if (!response.ok) {
-                throw new Error('Search failed');
-            }
+            <div className="space-y-3 mb-4">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>Rp {subtotal.toLocaleString('id-ID')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Biaya Pengiriman</span>
+                <span>{shipping === 0 ? 'Gratis' : `Rp ${shipping.toLocaleString('id-ID')}`}</span>
+              </div>
+              {shipping > 0 && (
+                <p className="text-sm text-green-600">
+                  Gratis ongkir untuk pembelian di atas Rp 500.000
+                </p>
+              )}
+              <div className="border-t pt-3">
+                <div className="flex justify-between font-semibold text-lg">
+                  <span>Total</span>
+                  <span className="text-indigo-600">Rp {total.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/checkout')}
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
+            >
+              Lanjut ke Pembayaran
+            </button>
+
+            <div className="mt-4 text-center">
+              <Link to="/" className="text-indigo-600 hover:underline text-sm">
+                ← Lanjut Belanja
+              </Link>
+            </div>
+          </div>
+
+          {/* Promo Code */}
+          <div className="bg-white rounded-lg shadow-md p-6 mt-4">
+            <h3 className="font-semibold mb-3">Kode Promo</h3>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                placeholder="Masukkan kode promo"
+                className="flex-1 border rounded-lg px-3 py-2"
+              />
+              <button className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300">
+                Terapkan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Checkout Page
+function CheckoutPage() {
+  const { cart, placeOrder } = useContext(AppContext);
+  const navigate = useNavigate();
+  const [shippingMethod, setShippingMethod] = useState('regular');
+  const [paymentMethod, setPaymentMethod] = useState('transfer');
+  const [shippingInfo, setShippingInfo] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: ''
+  });
+
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const shippingCost = shippingMethod === 'express' ? 50000 : (subtotal > 500000 ? 0 : 20000);
+  const total = subtotal + shippingCost;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const order = placeOrder({
+      shippingInfo,
+      shippingMethod,
+      paymentMethod,
+      subtotal,
+      shippingCost,
+      total
+    });
+    navigate('/orders');
+  };
+
+  if (cart.length === 0) {
+    navigate('/cart');
+    return null;
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+      
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Checkout Form */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Shipping Information */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Informasi Pengiriman</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                <input
+                  type="text"
+                  required
+                  value={shippingInfo.name}
+                  onChange={(e) => setShippingInfo({...shippingInfo, name: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
+                <input
+                  type="tel"
+                  required
+                  value={shippingInfo.phone}
+                  onChange={(e) => setShippingInfo({...shippingInfo, phone: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
+                <textarea
+                  required
+                  value={shippingInfo.address}
+                  onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kota</label>
+                <input
+                  type="text"
+                  required
+                  value={shippingInfo.city}
+                  onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Kode Pos</label>
+                <input
+                  type="text"
+                  required
+                  value={shippingInfo.postalCode}
+                  onChange={(e) => setShippingInfo({...shippingInfo, postalCode: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Shipping Method */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Metode Pengiriman</h2>
+            <div className="space-y-3">
+              <label className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="regular"
+                    checked={shippingMethod === 'regular'}
+                    onChange={(e) => setShippingMethod(e.target.value)}
+                    className="mr-3"
+                  />
+                  <div>
+                    <div className="font-medium">Reguler</div>
+                    <div className="text-sm text-gray-600">3-5 hari kerja</div>
+                  </div>
+                </div>
+                <span className="font-semibold">
+                  {shippingCost === 0 ? 'Gratis' : `Rp ${shippingCost.toLocaleString('id-ID')}`}
+                </span>
+              </label>
+              <label className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    name="shipping"
+                    value="express"
+                    checked={shippingMethod === 'express'}
+                    onChange={(e) => setShippingMethod(e.target.value)}
+                    className="mr-3"
+                  />
+                  <div>
+                    <div className="font-medium">Express</div>
+                    <div className="text-sm text-gray-600">1-2 hari kerja</div>
+                  </div>
+                </div>
+                <span className="font-semibold">Rp 50.000</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Payment Method */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Metode Pembayaran</h2>
+            <div className="space-y-3">
+              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="transfer"
+                  checked={paymentMethod === 'transfer'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="mr-3"
+                />
+                <div>
+                  <div className="font-medium">Transfer Bank</div>
+                  <div className="text-sm text-gray-600">BCA, Mandiri, BNI, BRI</div>
+                </div>
+              </label>
+              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="ewallet"
+                  checked={paymentMethod === 'ewallet'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="mr-3"
+                />
+                <div>
+                  <div className="font-medium">E-Wallet</div>
+                  <div className="text-sm text-gray-600">GoPay, OVO, DANA, ShopeePay</div>
+                </div>
+              </label>
+              <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="payment"
+                  value="cod"
+                  checked={paymentMethod === 'cod'}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="mr-3"
+                />
+                <div>
+                  <div className="font-medium">Cash on Delivery (COD)</div>
+                  <div className="text-sm text-gray-600">Bayar saat barang diterima</div>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Summary */}
+        <div>
+          <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
+            <h2 className="text-xl font-semibold mb-4">Ringkasan Pesanan</h2>
             
-            const data = await response.json();
-            return data.results || [];
-        }
-    </script>
-</body>
-</html>
+            <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+              {cart.map(item => (
+                <div key={`${item.id}-${item.size}`} className="flex items-center space-x-3">
+                  <img 
+                    src={item.image} 
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">{item.name}</div>
+                    <div className="text-xs text-gray-600">Size {item.size} x {item.quantity}</div>
+                  </div>
+                  <div className="text-sm font-semibold">
+                    Rp {(item.price * item.quantity).toLocaleString('id-ID')}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t pt-4 space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>Rp {subtotal.toLocaleString('id-ID')}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Pengiriman</span>
+                <span>{shippingCost === 0 ? 'Gratis' : `Rp ${shippingCost.toLocaleString('id-ID')}`}</span>
+              </div>
+              <div className="border-t pt-2">
+                <div className="flex justify-between font-semibold text-lg">
+                  <span>Total</span>
+                  <span className="text-indigo-600">Rp {total.toLocaleString('id-ID')}</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition mt-6"
+            >
+              Buat Pesanan
+            </button>
+
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Dengan melakukan checkout, Anda menyetujui syarat dan ketentuan kami
+            </p>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// Orders Page
+function OrdersPage() {
+  const { orders } = useContext(AppContext);
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Riwayat Pesanan</h1>
+      
+      {orders.length === 0 ? (
+        <div className="text-center py-16">
+          <svg className="w-24 h-24 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <h2 className="text-2xl font-bold mb-4">Belum Ada Pesanan</h2>
+          <p className="text-gray-600 mb-6">Anda belum memiliki pesanan apapun</p>
+          <Link to="/" className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
+            Mulai Belanja
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {orders.map(order => (
+            <div key={order.id} className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-semibold text-lg">Pesanan #{order.id}</h3>
+                  <p className="text-gray-600">{new Date(order.createdAt).toLocaleString('id-ID')}</p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                  order.status === 'shipping' ? 'bg-blue-100 text-blue-800' :
+                  order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {order.status === 'delivered' ? 'Terkirim' :
+                   order.status === 'shipping' ? 'Dalam Pengiriman' :
+                   order.status === 'processing' ? 'Diproses' : 'Menunggu'}
+                </span>
+              </div>
+
+              <div className="space-y-3 mb-4">
+                {order.items.map(item => (
+                  <div key={`${item.id}-${item.size}`} className="flex items-center space-x-4">
+                    <img 
+                      src={item.image} 
+                      alt={item.name}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-gray-600">Size {item.size} x {item.quantity}</div>
+                    </div>
+                    <div className="font-semibold">
+                      Rp {(item.price * item.quantity).toLocaleString('id-ID')}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t pt-4 flex justify-between items-center">
+                <div>
+                  <div className="text-sm text-gray-600">Total Pembayaran</div>
+                  <div className="text-xl font-bold text-indigo-600">
+                    Rp {order.total.toLocaleString('id-ID')}
+                  </div>
+                </div>
+                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                  Lacak Pesanan
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Admin Dashboard
+function AdminDashboard() {
+  const { products, orders, notifications } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalOrders = orders.length;
+  const totalProducts = products.length;
+  const lowStockProducts = products.filter(p => 
+    Object.values(p.stock).some(s => s < 5)
+  ).length;
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Dashboard Admin</h1>
+      
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Total Pendapatan</p>
+              <p className="text-2xl font-bold text-green-600">
+                Rp {totalRevenue.toLocaleString('id-ID')}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Total Pesanan</p>
+              <p className="text-2xl font-bold text-blue-600">{totalOrders}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Total Produk</p>
+              <p className="text-2xl font-bold text-purple-600">{totalProducts}</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600 text-sm">Stok Menipis</p>
+              <p className="text-2xl font-bold text-red-600">{lowStockProducts}</p>
+            </div>
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <button
+          onClick={() => navigate('/admin/products')}
+          className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition text-left"
+        >
+          <h3 className="font-semibold text-lg mb-2">Kelola Produk</h3>
+          <p className="text-gray-600 text-sm mb-4">Tambah, edit, atau hapus produk</p>
+          <div className="text-indigo-600 font-medium">Kelola →</div>
+        </button>
+
+        <button
+          onClick={() => navigate('/admin/orders')}
+          className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition text-left"
+        >
+          <h3 className="font-semibold text-lg mb-2">Kelola Pesanan</h3>
+          <p className="text-gray-600 text-sm mb-4">Lihat dan update status pesanan</p>
+          <div className="text-indigo-600 font-medium">Kelola →</div>
+        </button>
+
+        <button
+          onClick={() => navigate('/admin/customers')}
+          className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition text-left"
+        >
+          <h3 className="font-semibold text-lg mb-2">Kelola Pelanggan</h3>
+          <p className="text-gray-600 text-sm mb-4">Lihat data pelanggan</p>
+          <div className="text-indigo-600 font-medium">Kelola →</div>
+        </button>
+      </div>
+
+      {/* Recent Orders */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Pesanan Terbaru</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-2">ID Pesanan</th>
+                <th className="text-left py-2">Tanggal</th>
+                <th className="text-left py-2">Total</th>
+                <th className="text-left py-2">Status</th>
+                <th className="text-left py-2">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.slice(0, 5).map(order => (
+                <tr key={order.id} className="border-b">
+                  <td className="py-2">#{order.id}</td>
+                  <td className="py-2">{new Date(order.createdAt).toLocaleDateString('id-ID')}</td>
+                  <td className="py-2">Rp {order.total.toLocaleString('id-ID')}</td>
+                  <td className="py-2">
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                      order.status === 'shipping' ? 'bg-blue-100 text-blue-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="py-2">
+                    <button className="text-indigo-600 hover:underline text-sm">
+                      Detail
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Product Management
+function ProductManagement() {
+  const { products, setProducts } = useContext(AppContext);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const handleSaveProduct = (product) => {
+    if (editingProduct) {
+      setProducts(products.map(p => p.id === product.id ? product : p));
+    } else {
+      setProducts([...products, { ...product, id: Date.now() }]);
+    }
+    setEditingProduct(null);
+    setShowAddForm(false);
+  };
+
+  const handleDeleteProduct = (id) => {
+    if (confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+      setProducts(products.filter(p => p.id !== id));
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Kelola Produk</h1>
+        <button
+          onClick={() => setShowAddForm(true)}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+        >
+          Tambah Produk
+        </button>
+      </div>
+
+      {(showAddForm || editingProduct) && (
+        <ProductForm
+          product={editingProduct}
+          onSave={handleSaveProduct}
+          onCancel={() => {
+            setShowAddForm(false);
+            setEditingProduct(null);
+          }}
+        />
+      )}
+
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produk</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Merek</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {products.map(product => (
+                <tr key={product.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                        <div className="text-sm text-gray-500">{product.category}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {product.brand}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    Rp {product.price.toLocaleString('id-ID')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {Object.values(product.stock).reduce((a, b) => a + b, 0)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {product.isNew ? (
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Baru
+                      </span>
+                    ) : (
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                        Aktif
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      onClick={() => setEditingProduct(product)}
+                      className="text-indigo-600 hover:text-indigo-900 mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Product Form Component
+function ProductForm({ product, onSave, onCancel }) {
+  const [formData, setFormData] = useState({
+    name: product?.name || '',
+    brand: product?.brand || '',
+    price: product?.price || '',
+    originalPrice: product?.originalPrice || '',
+    category: product?.category || '',
+    description: product?.description || '',
+    image: product?.image || '',
+    sizes: product?.sizes || [],
+    isNew: product?.isNew || false
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <h2 className="text-2xl font-bold mb-6">
+          {product ? 'Edit Produk' : 'Tambah Produk Baru'}
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Merek</label>
+              <input
+                type="text"
+                required
+                value={formData.brand}
+                onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Harga</label>
+              <input
+                type="number"
+                required
+                value={formData.price}
+                onChange={(e) => setFormData({...formData, price: parseInt(e.target.value)})}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Harga Asli</label>
+              <input
+                type="number"
+                value={formData.originalPrice}
+                onChange={(e) => setFormData({...formData, originalPrice: parseInt(e.target.value)})}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+            <select
+              required
+              value={formData.category}
+              onChange={(e) => setFormData({...formData, category: e.target.value})}
+              className="w-full border rounded-lg px-3 py-2"
+            >
+              <option value="">Pilih Kategori</option>
+              <option value="Running">Running</option>
+              <option value="Casual">Casual</option>
+              <option value="Skate">Skate</option>
+              <option value="Lifestyle">Lifestyle</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+            <textarea
+              required
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full border rounded-lg px-3 py-2"
+              rows={3}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">URL Gambar</label>
+            <input
+              type="url"
+              required
+              value={formData.image}
+              onChange={(e) => setFormData({...formData, image: e.target.value})}
+              className="w-full border rounded-lg px-3 py-2"
+              placeholder="https://example.com/image.jpg"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Ukuran (pisahkan dengan koma)</label>
+            <input
+              type="text"
+              required
+              value={formData.sizes.join(', ')}
+              onChange={(e) => setFormData({...formData, sizes: e.target.value.split(',').map(s => parseInt(s.trim()))})}
+              className="w-full border rounded-lg px-3 py-2"
+              placeholder="38, 39, 40, 41, 42"
+            />
+          </div>
+
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="isNew"
+              checked={formData.isNew}
+              onChange={(e) => setFormData({...formData, isNew: e.target.checked})}
+              className="mr-2"
+            />
+            <label htmlFor="isNew" className="text-sm font-medium text-gray-700">
+              Tandai sebagai produk baru
+            </label>
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Order Management
+function OrderManagement() {
+  const { orders, updateOrderStatus } = useContext(AppContext);
+
+  const handleStatusChange = (orderId, newStatus) => {
+    updateOrderStatus(orderId, newStatus);
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Kelola Pesanan</h1>
+
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pesanan</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {orders.map(order => (
+                <tr key={order.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    #{order.id}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {order.shippingInfo?.name || 'Guest'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {new Date(order.createdAt).toLocaleDateString('id-ID')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    Rp {order.total.toLocaleString('id-ID')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                      className="text-sm border rounded px-2 py-1"
+                    >
+                      <option value="pending">Menunggu</option>
+                      <option value="processing">Diproses</option>
+                      <option value="shipping">Dikirim</option>
+                      <option value="delivered">Terkirim</option>
+                      <option value="cancelled">Dibatalkan</option>
+                    </select>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button className="text-indigo-600 hover:text-indigo-900">
+                      Detail
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Customer Management
+function CustomerManagement() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Kelola Pelanggan</h1>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <p className="text-gray-600">Fitur manajemen pelanggan akan segera hadir.</p>
+      </div>
+    </div>
+  );
+}
+
+// Footer Component
+function Footer() {
+  return (
+    <footer className="bg-gray-900 text-white mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="text-2xl font-bold mb-4">ShoeStore</h3>
+            <p className="text-gray-400">Toko sepatu online terpercaya dengan koleksi terbaik.</p>
+            <div className="flex space-x-4 mt-4">
+              <a href="#" className="text-gray-400 hover:text-white">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2">
+              <li><a href="#" className="text-gray-400 hover:text-white">Tentang Kami</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Produk</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Promo</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4">Layanan</h4>
+            <ul className="space-y-2">
+              <li><a href="#" className="text-gray-400 hover:text-white">Pengiriman</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Pengembalian</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Size Guide</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4">Newsletter</h4>
+            <p className="text-gray-400 mb-4">Dapatkan penawaran terbaru dari kami</p>
+            <div className="flex">
+              <input
+                type="email"
+                placeholder="Email Anda"
+                className="flex-1 px-4 py-2 rounded-l-lg text-gray-900"
+              />
+              <button className="bg-indigo-600 px-4 py-2 rounded-r-lg hover:bg-indigo-700">
+                Subscribe
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>&copy; 2024 ShoeStore. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+export default App;
