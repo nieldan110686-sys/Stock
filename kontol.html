@@ -1,533 +1,463 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CYBERSEARCH - Mesin Pencari Cyberpunk</title>
-<!-- Font Google untuk tema cyberpunk -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}
-
-body {
-font-family: 'JetBrains Mono', 'Courier New', monospace;
-background: #000;
-color: #00ffff; /* Cyan neon sebagai warna utama */
-min-height: 100vh;
-overflow-x: hidden;
-position: relative;
-}
-
-/* Background Grid dengan efek Matrix Rain */
-.bg-grid {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: linear-gradient(135deg, rgba(0, 255, 0, 0.05) 0%, #000 50%, rgba(255, 0, 255, 0.05) 100%);
-pointer-events: none;
-z-index: 1;
-}
-
-.bg-grid::before {
-content: '';
-position: absolute;
-inset: 0;
-background-image:
-linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
-linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
-background-size: 40px 40px;
-}
-
-/* Matrix Rain Effect */
-.matrix-rain {
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-overflow: hidden;
-pointer-events: none;
-z-index: 2;
-}
-
-.matrix-rain span {
-position: absolute;
-color: rgba(0, 255, 0, 0.3);
-font-size: 14px;
-animation: fall 10s linear infinite;
-}
-
-@keyframes fall {
-0% { transform: translateY(-100vh); opacity: 1; }
-100% { transform: translateY(100vh); opacity: 0; }
-}
-
-/* Glitch Effect yang Ditingkatkan */
-@keyframes glitch {
-0%, 100% {
-text-shadow:
-0.05em 0 0 rgba(255, 0, 0, 0.75),
--0.05em -0.025em 0 rgba(0, 255, 0, 0.75),
-0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
-transform: translate(0);
-}
-20% {
-text-shadow:
--0.05em -0.025em 0 rgba(255, 0, 0, 0.75),
-0.025em 0.025em 0 rgba(0, 255, 0, 0.75),
--0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
-transform: translate(-2px, 2px);
-}
-40% {
-text-shadow:
-0.025em 0.05em 0 rgba(255, 0, 0, 0.75),
-0.05em 0 0 rgba(0, 255, 0, 0.75),
-0 -0.05em 0 rgba(0, 0, 255, 0.75);
-transform: translate(2px, -2px);
-}
-60% {
-text-shadow:
--0.025em -0.05em 0 rgba(255, 0, 0, 0.75),
--0.05em 0 0 rgba(0, 255, 0, 0.75),
-0 0.05em 0 rgba(0, 0, 255, 0.75);
-transform: translate(-2px, 2px);
-}
-}
-
-/* Neon Flicker yang Lebih Halus */
-@keyframes neon-flicker {
-0%, 18%, 22%, 25%, 53%, 57%, 100% {
-opacity: 1;
-text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
-}
-20%, 24%, 55% {
-opacity: 0.8;
-text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
-}
-}
-
-/* Scanline Effect */
-@keyframes scanline {
-0% {
-transform: translateY(-100%);
-}
-100% {
-transform: translateY(100%);
-}
-}
-
-.glitch {
-animation: glitch 3s infinite;
-font-family: 'Orbitron', sans-serif;
-}
-
-.neon-flicker {
-animation: neon-flicker 2s infinite;
-}
-
-.scanline {
-position: relative;
-}
-
-.scanline::before {
-content: "";
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-height: 3px;
-background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.6), transparent);
-animation: scanline 6s linear infinite;
-pointer-events: none;
-}
-
-/* Main Container */
-.container {
-position: relative;
-z-index: 10;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-min-height: 100vh;
-padding: 20px;
-}
-
-/* Header yang Lebih Dramatis */
-.header {
-text-align: center;
-margin-bottom: 60px;
-}
-
-.logo-container {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 20px;
-margin-bottom: 30px;
-}
-
-.icon {
-width: 60px;
-height: 60px;
-position: relative;
-}
-
-.icon-cpu {
-color: #00ffff;
-animation: pulse 2s infinite;
-filter: drop-shadow(0 0 10px #00ffff);
-}
-
-.icon-globe {
-color: #ff00ff;
-animation: pulse 2s infinite;
-filter: drop-shadow(0 0 10px #ff00ff);
-}
-
-.icon-glow {
-position: absolute;
-inset: 0;
-width: 60px;
-height: 60px;
-border-radius: 50%;
-filter: blur(25px);
-animation: pulse 2s infinite;
-}
-
-.cpu-glow {
-background: rgba(0, 255, 255, 0.3);
-}
-
-.globe-glow {
-background: rgba(255, 0, 255, 0.3);
-}
-
-.title {
-font-size: 5rem;
-font-weight: 700;
-background: linear-gradient(90deg, #00ffff, #ff00ff, #ff0000);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-margin: 0;
-letter-spacing: 4px;
-text-transform: uppercase;
-}
-
-.subtitle {
-color: rgba(0, 255, 255, 0.8);
-font-size: 1.25rem;
-margin-top: 20px;
-font-weight: 500;
-}
-
-/* Search Form yang Ditingkatkan */
-.search-form {
-width: 100%;
-max-width: 800px;
-margin-bottom: 40px;
-}
-
-.search-container {
-position: relative;
-}
-
-.search-glow {
-position: absolute;
-inset: -6px;
-background: linear-gradient(90deg, #00ffff, #ff00ff);
-border-radius: 12px;
-filter: blur(15px);
-opacity: 0.8;
-animation: pulse 2s infinite;
-}
-
-.search-wrapper {
-position: relative;
-display: flex;
-gap: 12px;
-background: rgba(0, 0, 0, 0.8);
-border: 2px solid rgba(0, 255, 255, 0.5);
-border-radius: 12px;
-padding: 4px;
-backdrop-filter: blur(8px);
-}
-
-.search-input {
-flex: 1;
-background: transparent;
-border: none;
-color: #00ffff;
-font-family: 'JetBrains Mono', monospace;
-font-size: 1.25rem;
-padding: 20px 24px;
-border-radius: 8px;
-transition: all 0.3s ease;
-}
-
-.search-input::placeholder {
-color: rgba(0, 255, 255, 0.5);
-}
-
-.search-input:focus {
-outline: none;
-box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.3);
-}
-
-.search-button {
-background: linear-gradient(90deg, #00ffff, #ff00ff);
-color: #000;
-font-weight: bold;
-padding: 20px 40px;
-border: none;
-border-radius: 8px;
-cursor: pointer;
-transition: all 0.3s ease;
-font-family: 'JetBrains Mono', monospace;
-font-size: 1.1rem;
-position: relative;
-overflow: hidden;
-}
-
-.search-button::before {
-content: '';
-position: absolute;
-top: 50%;
-left: 50%;
-width: 0;
-height: 0;
-background: rgba(255, 255, 255, 0.3);
-border-radius: 50%;
-transform: translate(-50%, -50%);
-transition: width 0.6s, height 0.6s;
-}
-
-.search-button:hover::before {
-width: 300px;
-height: 300px;
-}
-
-.search-button:hover {
-background: linear-gradient(90deg, #00ffff, #ff0000);
-transform: scale(1.05);
-}
-
-.search-button:disabled {
-opacity: 0.5;
-cursor: not-allowed;
-transform: none;
-}
-
-.loading-spinner {
-width: 18px;
-height: 18px;
-border: 3px solid #000;
-border-top: 3px solid transparent;
-border-radius: 50%;
-animation: spin 1s linear infinite;
-display: inline-block;
-margin-right: 10px;
-}
-
-@keyframes spin {
-0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
-}
-
-/* Results dengan Efek 3D */
-.results-container {
-width: 100%;
-max-width: 1000px;
-animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-from { opacity: 0; transform: translateY(20px); }
-to { opacity: 1; transform: translateY(0); }
-}
-
-.results-header {
-color: rgba(0, 255, 255, 0.8);
-font-family: 'JetBrains Mono', monospace;
-margin-bottom: 20px;
-font-size: 1.1rem;
-}
-
-.result-card {
-background: rgba(0, 0, 0, 0.8);
-border: 2px solid rgba(0, 255, 255, 0.3);
-border-radius: 12px;
-padding: 30px;
-margin-bottom: 20px;
-backdrop-filter: blur(8px);
-transition: all 0.3s ease;
-transform-style: preserve-3d;
-}
-
-.result-card:hover {
-border-color: rgba(0, 255, 255, 0.8);
-box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2), 0 0 40px rgba(0, 255, 0, 0.1);
-transform: translateY(-5px) rotateX(5deg);
-}
-
-.result-content {
-display: flex;
-align-items: flex-start;
-gap: 20px;
-}
-
-.result-bullet {
-width: 10px;
-height: 10px;
-background: #00ffff;
-border-radius: 50%;
-margin-top: 10px;
-animation: pulse 2s infinite;
-box-shadow: 0 0 10px #00ffff;
-}
-
-.result-info {
-flex: 1;
-}
-
-.result-title {
-color: #00ffff;
-font-size: 1.25rem;
-font-weight: 600;
-margin-bottom: 10px;
-}
-
-.result-title a {
-color: inherit;
-text-decoration: none;
-display: flex;
-align-items: center;
-gap: 10px;
-transition: color 0.3s ease;
-}
-
-.result-title a:hover {
-color: #ffffff;
-}
-
-.result-url {
-color: rgba(0, 255, 255, 0.6);
-font-size: 0.9rem;
-margin-bottom: 10px;
-}
-
-.result-snippet {
-color: rgba(0, 255, 255, 0.9);
-line-height: 1.6;
-}
-
-.result-meta {
-display: flex;
-align-items: center;
-gap: 20px;
-margin-top: 15px;
-font-size: 0.8rem;
-color: rgba(0, 255, 255, 0.5);
-}
-
-.no-results {
-text-align: center;
-padding: 60px 0;
-animation: fadeIn 0.5s ease-in;
-}
-
-.no-results-title {
-color: rgba(0, 255, 255, 0.5);
-font-size: 1.25rem;
-margin-bottom: 10px;
-}
-
-.no-results-subtitle {
-color: rgba(0, 255, 255, 0.3);
-font-size: 1rem;
-}
-
-/* Footer */
-.footer {
-position: absolute;
-bottom: 20px;
-left: 0;
-right: 0;
-text-align: center;
-}
-
-.footer-text {
-color: rgba(0, 255, 255, 0.3);
-font-size: 0.8rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-.title {
-font-size: 3.5rem;
-}
-
-.search-wrapper {
-flex-direction: column;
-}
-
-.search-button {
-width: 100%;
-}
-
-.result-card {
-padding: 20px;
-}
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-width: 10px;
-}
-
-::-webkit-scrollbar-track {
-background: rgba(0, 0, 0, 0.2);
-}
-
-::-webkit-scrollbar-thumb {
-background: linear-gradient(180deg, rgba(0, 255, 255, 0.7), rgba(255, 0, 255, 0.7));
-border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-background: linear-gradient(180deg, rgba(0, 255, 255, 0.9), rgba(255, 0, 255, 0.9));
-}
-
-/* Preferensi untuk mengurangi animasi */
-@media (prefers-reduced-motion: reduce) {
-* {
-animation: none !important;
-}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Pencatatan Pinjaman</title>
+    <style>
+        /* --- CSS untuk Desain yang Menarik dan Simpel --- */
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-color: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #eef2f7;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        /* --- Form Styling --- */
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        
+        .form-group input[readonly] {
+            background-color: var(--light-color);
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .form-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* --- Table Styling --- */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f3f5;
+        }
+        
+        td .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* --- Summary Styling --- */
+        .summary {
+            margin-top: 2rem;
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        
+        .summary span {
+            margin-left: 1rem;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-actions {
+                justify-content: center;
+            }
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="bg-grid"></div>
-<div class="matrix-rain" id="matrixRain"></div>
 
-<div class="container scanline">
-<!-- Header -->
-<header class="header">
-<div class="logo-container">
-<div class="icon">
-<svg class="icon-cpu" fill="currentColor" viewBox="0 0 24 24">
-<path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm7 0h2v2h-2v-2zm0 4h2v2h-2v-2zm4-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
-</svg>
-<div class="icon-glow cpu-glow"></div>
-</div>
-<h1 class="title glitch">CYBERSEARCH</h1>
-<div class="icon">
-<svg class="icon-globe" fill="currentColor" viewBox="0 0 24 24">
-<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.
+    <div class="container">
+        <h1>📊 Aplikasi Pencatatan Pinjaman</h1>
+
+        <!-- Form Input Data -->
+        <div class="card">
+            <form id="loanForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal</label>
+                        <input type="date" id="tanggal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nama">Nama</label>
+                        <input type="text" id="nama" placeholder="Masukkan Nama" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="situs">Situs</label>
+                        <input type="text" id="situs" placeholder="Nama Situs/Platform" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="keterangan">Keterangan</label>
+                        <select id="keterangan" required>
+                            <option value="BELUM BAYAR">BELUM BAYAR</option>
+                            <option value="LUNAS">LUNAS</option>
+                            <option value="LANJUT">LANJUT</option>
+                            <option value="BULAN KEMARIN">BULAN KEMARIN</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rupiah">Jumlah Rupiah</label>
+                        <input type="number" id="rupiah" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bath">Jumlah Bath</label>
+                        <input type="number" id="bath" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bungaRupiah">BUNGA 20% Rupiah</label>
+                        <input type="number" id="bungaRupiah" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="bungaBath">BUNGA 20% Bath</label>
+                        <input type="number" id="bungaBath" readonly>
+                    </div>
+                </div>
+                <input type="hidden" id="editIndex" value="">
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Tambah Data</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tabel Data -->
+        <h2>📋 Data Pinjaman</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Nama</th>
+                        <th>Situs</th>
+                        <th>Keterangan</th>
+                        <th>Jumlah Rupiah</th>
+                        <th>Jumlah Bath</th>
+                        <th>Bunga 20% Rupiah</th>
+                        <th>Bunga 20% Bath</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="loanTableBody">
+                    <!-- Data akan dimuat di sini oleh JavaScript -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Ringkasan Total -->
+        <div class="summary">
+            Total Pinjaman Rupiah: <span id="totalRupiah">0</span> | 
+            Total Pinjaman Bath: <span id="totalBath">0</span> | 
+            Total Bunga Rupiah: <span id="totalBungaRupiah">0</span> | 
+            Total Bunga Bath: <span id="totalBungaBath">0</span>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript untuk Fungsionalitas ---
+
+        // Mengambil elemen-elemen dari DOM
+        const loanForm = document.getElementById('loanForm');
+        const loanTableBody = document.getElementById('loanTableBody');
+        const submitBtn = document.getElementById('submitBtn');
+        const editIndexInput = document.getElementById('editIndex');
+
+        // Input fields
+        const tanggalInput = document.getElementById('tanggal');
+        const namaInput = document.getElementById('nama');
+        const situsInput = document.getElementById('situs');
+        const keteranganInput = document.getElementById('keterangan');
+        const rupiahInput = document.getElementById('rupiah');
+        const bathInput = document.getElementById('bath');
+        const bungaRupiahInput = document.getElementById('bungaRupiah');
+        const bungaBathInput = document.getElementById('bungaBath');
+
+        // Summary elements
+        const totalRupiahEl = document.getElementById('totalRupiah');
+        const totalBathEl = document.getElementById('totalBath');
+        const totalBungaRupiahEl = document.getElementById('totalBungaRupiah');
+        const totalBungaBathEl = document.getElementById('totalBungaBath');
+
+        // Inisialisasi data dari localStorage
+        let loans = JSON.parse(localStorage.getItem('loans')) || [];
+
+        // --- FUNGSI UTAMA ---
+
+        // Fungsi untuk menyimpan data ke localStorage
+        function saveData() {
+            localStorage.setItem('loans', JSON.stringify(loans));
+        }
+
+        // Fungsi untuk merender tabel
+        function renderTable() {
+            loanTableBody.innerHTML = '';
+            let sumRupiah = 0, sumBath = 0, sumBungaRupiah = 0, sumBungaBath = 0;
+
+            loans.forEach((loan, index) => {
+                const row = document.createElement('tr');
+                
+                // Format angka agar mudah dibaca
+                const formatRupiah = new Intl.NumberFormat('id-ID');
+                const formatBath = new Intl.NumberFormat('th-TH');
+
+                row.innerHTML = `
+                    <td>${loan.tanggal}</td>
+                    <td>${loan.nama}</td>
+                    <td>${loan.situs}</td>
+                    <td><span class="badge badge-${loan.keterangan.toLowerCase().replace(' ', '-')}">${loan.keterangan}</span></td>
+                    <td>${formatRupiah.format(loan.rupiah)}</td>
+                    <td>${formatBath.format(loan.bath)}</td>
+                    <td>${formatRupiah.format(loan.bungaRupiah)}</td>
+                    <td>${formatBath.format(loan.bungaBath)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-warning btn-sm" onclick="editLoan(${index})">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteLoan(${index})">Hapus</button>
+                        </div>
+                    </td>
+                `;
+                loanTableBody.appendChild(row);
+
+                // Menjumlahkan total
+                sumRupiah += loan.rupiah;
+                sumBath += loan.bath;
+                sumBungaRupiah += loan.bungaRupiah;
+                sumBungaBath += loan.bungaBath;
+            });
+
+            // Memperbarui tampilan total
+            totalRupiahEl.textContent = new Intl.NumberFormat('id-ID').format(sumRupiah);
+            totalBathEl.textContent = new Intl.NumberFormat('th-TH').format(sumBath);
+            totalBungaRupiahEl.textContent = new Intl.NumberFormat('id-ID').format(sumBungaRupiah);
+            totalBungaBathEl.textContent = new Intl.NumberFormat('th-TH').format(sumBungaBath);
+        }
+
+        // Fungsi untuk menghitung bunga otomatis
+        function calculateInterest() {
+            const rupiah = parseFloat(rupiahInput.value) || 0;
+            const bath = parseFloat(bathInput.value) || 0;
+            
+            bungaRupiahInput.value = rupiah * 0.2;
+            bungaBathInput.value = bath * 0.2;
+        }
+
+        // Fungsi untuk menambah atau mengupdate data
+        function handleFormSubmit(event) {
+            event.preventDefault();
+
+            const loanData = {
+                tanggal: tanggalInput.value,
+                nama: namaInput.value,
+                situs: situsInput.value,
+                keterangan: keteranganInput.value,
+                rupiah: parseFloat(rupiahInput.value),
+                bath: parseFloat(bathInput.value),
+                bungaRupiah: parseFloat(bungaRupiahInput.value),
+                bungaBath: parseFloat(bungaBathInput.value)
+            };
+
+            const editIndex = editIndexInput.value;
+            if (editIndex === "") {
+                // Tambah data baru
+                loans.push(loanData);
+            } else {
+                // Update data yang ada
+                loans[editIndex] = loanData;
+            }
+
+            saveData();
+            renderTable();
+            loanForm.reset();
+            editIndexInput.value = '';
+            submitBtn.textContent = 'Tambah Data';
+            calculateInterest(); // Reset bunga setelah form di-reset
+        }
+
+        // Fungsi untuk mengedit data
+        function editLoan(index) {
+            const loan = loans[index];
+            tanggalInput.value = loan.tanggal;
+            namaInput.value = loan.nama;
+            situsInput.value = loan.situs;
+            keteranganInput.value = loan.keterangan;
+            rupiahInput.value = loan.rupiah;
+            bathInput.value = loan.bath;
+            bungaRupiahInput.value = loan.bungaRupiah;
+            bungaBathInput.value = loan.bungaBath;
+
+            editIndexInput.value = index;
+            submitBtn.textContent = 'Update Data';
+            
+            // Scroll ke form agar mudah diedit
+            loanForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Fungsi untuk menghapus data
+        function deleteLoan(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                loans.splice(index, 1);
+                saveData();
+                renderTable();
+            }
+        }
+
+        // --- EVENT LISTENER ---
+        loanForm.addEventListener('submit', handleFormSubmit);
+        rupiahInput.addEventListener('input', calculateInterest);
+        bathInput.addEventListener('input', calculateInterest);
+
+        // --- INISIALISASI AWAL ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set tanggal hari ini sebagai default
+            tanggalInput.valueAsDate = new Date();
+            renderTable();
+        });
+
+    </script>
+</body>
+</html>
