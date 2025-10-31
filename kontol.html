@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Pencatatan Pinjaman</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <style>
         /* --- CSS untuk Desain yang Menarik dan Simpel --- */
         :root {
@@ -197,6 +200,58 @@
             margin-left: 1rem;
         }
 
+        /* --- Badge Styling --- */
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        
+        .badge-belum-bayar {
+            color: #fff;
+            background-color: var(--danger-color);
+        }
+        
+        .badge-lunas {
+            color: #fff;
+            background-color: var(--success-color);
+        }
+        
+        .badge-lanjut {
+            color: #212529;
+            background-color: var(--warning-color);
+        }
+        
+        .badge-bulan-kemarin {
+            color: #fff;
+            background-color: var(--secondary-color);
+        }
+
+        /* --- Notification Styling --- */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(120%);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
             .form-grid {
@@ -298,14 +353,34 @@
         </div>
     </div>
 
+    <!-- Notification Element -->
+    <div id="notification" class="notification"></div>
+
     <script>
         // --- JavaScript untuk Fungsionalitas ---
+
+        // Konfigurasi Firebase - Ganti dengan konfigurasi Firebase Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            authDomain: "your-project-id.firebaseapp.com",
+            databaseURL: "https://your-project-id-default-rtdb.firebaseio.com",
+            projectId: "your-project-id",
+            storageBucket: "your-project-id.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const loansRef = database.ref('loans');
 
         // Mengambil elemen-elemen dari DOM
         const loanForm = document.getElementById('loanForm');
         const loanTableBody = document.getElementById('loanTableBody');
         const submitBtn = document.getElementById('submitBtn');
         const editIndexInput = document.getElementById('editIndex');
+        const notification = document.getElementById('notification');
 
         // Input fields
         const tanggalInput = document.getElementById('tanggal');
@@ -323,14 +398,22 @@
         const totalBungaRupiahEl = document.getElementById('totalBungaRupiah');
         const totalBungaBathEl = document.getElementById('totalBungaBath');
 
-        // Inisialisasi data dari localStorage
-        let loans = JSON.parse(localStorage.getItem('loans')) || [];
+        // Inisialisasi data
+        let loans = [];
+        let editingKey = null;
 
         // --- FUNGSI UTAMA ---
 
-        // Fungsi untuk menyimpan data ke localStorage
-        function saveData() {
-            localStorage.setItem('loans', JSON.stringify(loans));
+        // Fungsi untuk menampilkan notifikasi
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.style.backgroundColor = type === 'success' ? 
+                'var(--success-color)' : 'var(--danger-color)';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
 
         // Fungsi untuk merender tabel
@@ -338,26 +421,43 @@
             loanTableBody.innerHTML = '';
             let sumRupiah = 0, sumBath = 0, sumBungaRupiah = 0, sumBungaBath = 0;
 
-            loans.forEach((loan, index) => {
+            loans.forEach((loan) => {
                 const row = document.createElement('tr');
                 
                 // Format angka agar mudah dibaca
                 const formatRupiah = new Intl.NumberFormat('id-ID');
                 const formatBath = new Intl.NumberFormat('th-TH');
+                
+                // Kelas badge berdasarkan keterangan
+                let badgeClass = 'badge-';
+                switch(loan.keterangan) {
+                    case 'BELUM BAYAR':
+                        badgeClass += 'belum-bayar';
+                        break;
+                    case 'LUNAS':
+                        badgeClass += 'lunas';
+                        break;
+                    case 'LANJUT':
+                        badgeClass += 'lanjut';
+                        break;
+                    case 'BULAN KEMARIN':
+                        badgeClass += 'bulan-kemarin';
+                        break;
+                }
 
                 row.innerHTML = `
                     <td>${loan.tanggal}</td>
                     <td>${loan.nama}</td>
                     <td>${loan.situs}</td>
-                    <td><span class="badge badge-${loan.keterangan.toLowerCase().replace(' ', '-')}">${loan.keterangan}</span></td>
+                    <td><span class="badge ${badgeClass}">${loan.keterangan}</span></td>
                     <td>${formatRupiah.format(loan.rupiah)}</td>
                     <td>${formatBath.format(loan.bath)}</td>
                     <td>${formatRupiah.format(loan.bungaRupiah)}</td>
                     <td>${formatBath.format(loan.bungaBath)}</td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn btn-warning btn-sm" onclick="editLoan(${index})">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteLoan(${index})">Hapus</button>
+                            <button class="btn btn-warning btn-sm" onclick="editLoan('${loan.key}')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteLoan('${loan.key}')">Hapus</button>
                         </div>
                     </td>
                 `;
@@ -401,48 +501,64 @@
                 bungaBath: parseFloat(bungaBathInput.value)
             };
 
-            const editIndex = editIndexInput.value;
-            if (editIndex === "") {
-                // Tambah data baru
-                loans.push(loanData);
-            } else {
+            if (editingKey) {
                 // Update data yang ada
-                loans[editIndex] = loanData;
+                loansRef.child(editingKey).update(loanData)
+                    .then(() => {
+                        showNotification('Data berhasil diperbarui!');
+                        loanForm.reset();
+                        editingKey = null;
+                        submitBtn.textContent = 'Tambah Data';
+                        calculateInterest();
+                    })
+                    .catch(error => {
+                        showNotification('Gagal memperbarui data: ' + error.message, 'error');
+                    });
+            } else {
+                // Tambah data baru
+                loansRef.push(loanData)
+                    .then(() => {
+                        showNotification('Data berhasil ditambahkan!');
+                        loanForm.reset();
+                        calculateInterest();
+                    })
+                    .catch(error => {
+                        showNotification('Gagal menambahkan data: ' + error.message, 'error');
+                    });
             }
-
-            saveData();
-            renderTable();
-            loanForm.reset();
-            editIndexInput.value = '';
-            submitBtn.textContent = 'Tambah Data';
-            calculateInterest(); // Reset bunga setelah form di-reset
         }
 
         // Fungsi untuk mengedit data
-        function editLoan(index) {
-            const loan = loans[index];
-            tanggalInput.value = loan.tanggal;
-            namaInput.value = loan.nama;
-            situsInput.value = loan.situs;
-            keteranganInput.value = loan.keterangan;
-            rupiahInput.value = loan.rupiah;
-            bathInput.value = loan.bath;
-            bungaRupiahInput.value = loan.bungaRupiah;
-            bungaBathInput.value = loan.bungaBath;
+        function editLoan(key) {
+            const loan = loans.find(l => l.key === key);
+            if (loan) {
+                tanggalInput.value = loan.tanggal;
+                namaInput.value = loan.nama;
+                situsInput.value = loan.situs;
+                keteranganInput.value = loan.keterangan;
+                rupiahInput.value = loan.rupiah;
+                bathInput.value = loan.bath;
+                bungaRupiahInput.value = loan.bungaRupiah;
+                bungaBathInput.value = loan.bungaBath;
 
-            editIndexInput.value = index;
-            submitBtn.textContent = 'Update Data';
-            
-            // Scroll ke form agar mudah diedit
-            loanForm.scrollIntoView({ behavior: 'smooth' });
+                editingKey = key;
+                submitBtn.textContent = 'Update Data';
+                
+                // Scroll ke form agar mudah diedit
+                loanForm.scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
         // Fungsi untuk menghapus data
-        function deleteLoan(index) {
+        function deleteLoan(key) {
             if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-                loans.splice(index, 1);
-                saveData();
-                renderTable();
+                loansRef.child(key).remove()
+                    .then(() => {
+                        showNotification('Data berhasil dihapus!');
+                    })
+                    .catch(error => {
+                        showNotification('Gagal menghapus data: ' + error.message, 'error');
+                    });
             }
         }
 
@@ -455,7 +571,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Set tanggal hari ini sebagai default
             tanggalInput.valueAsDate = new Date();
-            renderTable();
+            
+            // Mendengarkan perubahan data di Firebase
+            loansRef.on('value', (snapshot) => {
+                loans = [];
+                snapshot.forEach((childSnapshot) => {
+                    const childKey = childSnapshot.key;
+                    const childData = childSnapshot.val();
+                    childData.key = childKey;
+                    loans.push(childData);
+                });
+                renderTable();
+            }, (error) => {
+                showNotification('Gagal memuat data: ' + error.message, 'error');
+            });
         });
 
     </script>
