@@ -1,12 +1,1209 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-x = np.linspace (-5, 5, 50)
-y = np.linspace(-5, 5, 50)
-X, Y = np.meshgrid(x, y)
-Z = np.sin(np.sqrt(X**2 + Y**2))
-fig plt.figure()
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Clone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --border-color: #d0d0d0;
+            --header-bg: #f8f9fa;
+            --selected-bg: #e8f0fe;
+            --active-border: #4285f4;
+        }
 
-ax = fig.add_subplot(111, projection='3d')
-ax.plot_surface(X, Y, Z, cmap='viridis')
-plt.show()
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+            color: #202124;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Toolbar Styles */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #fff;
+        }
+
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+        }
+
+        .toolbar-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5f6368;
+            margin-right: 4px;
+        }
+
+        .toolbar-button:hover {
+            background-color: #f1f3f4;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background-color: var(--border-color);
+            margin: 0 8px;
+        }
+
+        .formula-bar {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--header-bg);
+        }
+
+        .cell-address {
+            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #5f6368;
+            min-width: 80px;
+            border-right: 1px solid var(--border-color);
+            margin-right: 8px;
+        }
+
+        .formula-input {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .formula-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* Spreadsheet Container */
+        .spreadsheet-container {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+        }
+
+        .spreadsheet {
+            display: flex;
+            flex-direction: column;
+            min-width: 100%;
+            min-height: 100%;
+        }
+
+        /* Header Row */
+        .header-row {
+            display: flex;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .corner-cell {
+            width: 40px;
+            height: 24px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f6368;
+        }
+
+        .column-header {
+            min-width: 100px;
+            height: 24px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f6368;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .column-header:hover {
+            background-color: #f1f3f4;
+        }
+
+        .column-header.selected {
+            background-color: var(--selected-bg);
+        }
+
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            cursor: col-resize;
+            z-index: 1;
+        }
+
+        /* Rows */
+        .row {
+            display: flex;
+        }
+
+        .row-header {
+            width: 40px;
+            min-height: 24px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #5f6368;
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            background-color: var(--header-bg);
+        }
+
+        .row-header:hover {
+            background-color: #f1f3f4;
+        }
+
+        .row-header.selected {
+            background-color: var(--selected-bg);
+        }
+
+        .cell {
+            min-width: 100px;
+            height: 24px;
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 4px 8px;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: cell;
+            position: relative;
+        }
+
+        .cell.selected {
+            background-color: var(--selected-bg);
+            border: 2px solid var(--active-border);
+            padding: 2px 6px;
+        }
+
+        .cell.editing {
+            padding: 0;
+        }
+
+        .cell-input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 4px 8px;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        .selection-area {
+            position: absolute;
+            border: 1px solid var(--active-border);
+            background-color: rgba(66, 133, 244, 0.1);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            display: none;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .context-menu-item:hover {
+            background-color: #f1f3f4;
+        }
+
+        .context-menu-item i {
+            margin-right: 8px;
+            width: 16px;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 4px 0;
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 16px;
+            color: #5f6368;
+        }
+
+        /* Status bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 16px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--header-bg);
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        .status-left, .status-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-item {
+            margin-right: 16px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="undo-btn" title="Undo">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="toolbar-button" id="redo-btn" title="Redo">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="print-btn" title="Print">
+                    <i class="fas fa-print"></i>
+                </button>
+                <button class="toolbar-button" id="paint-format-btn" title="Paint format">
+                    <i class="fas fa-paint-roller"></i>
+                </button>
+                <button class="toolbar-button" id="zoom-btn" title="Zoom">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="bold-btn" title="Bold">
+                    <i class="fas fa-bold"></i>
+                </button>
+                <button class="toolbar-button" id="italic-btn" title="Italic">
+                    <i class="fas fa-italic"></i>
+                </button>
+                <button class="toolbar-button" id="underline-btn" title="Underline">
+                    <i class="fas fa-underline"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="text-color-btn" title="Text color">
+                    <i class="fas fa-font"></i>
+                </button>
+                <button class="toolbar-button" id="fill-color-btn" title="Fill color">
+                    <i class="fas fa-fill-drip"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="merge-btn" title="Merge cells">
+                    <i class="fas fa-object-group"></i>
+                </button>
+                <button class="toolbar-button" id="border-btn" title="Borders">
+                    <i class="fas fa-border-all"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="align-left-btn" title="Align left">
+                    <i class="fas fa-align-left"></i>
+                </button>
+                <button class="toolbar-button" id="align-center-btn" title="Align center">
+                    <i class="fas fa-align-center"></i>
+                </button>
+                <button class="toolbar-button" id="align-right-btn" title="Align right">
+                    <i class="fas fa-align-right"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="wrap-text-btn" title="Wrap text">
+                    <i class="fas fa-text-width"></i>
+                </button>
+                <button class="toolbar-button" id="text-rotation-btn" title="Text rotation">
+                    <i class="fas fa-text-height"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="link-btn" title="Insert link">
+                    <i class="fas fa-link"></i>
+                </button>
+                <button class="toolbar-button" id="comment-btn" title="Insert comment">
+                    <i class="fas fa-comment"></i>
+                </button>
+                <button class="toolbar-button" id="chart-btn" title="Insert chart">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+                <button class="toolbar-button" id="checkbox-btn" title="Insert checkbox">
+                    <i class="fas fa-check-square"></i>
+                </button>
+            </div>
+            
+            <div class="toolbar-divider"></div>
+            
+            <div class="toolbar-section">
+                <button class="toolbar-button" id="function-btn" title="Insert function">
+                    <i class="fas fa-function"></i>
+                </button>
+                <button class="toolbar-button" id="filter-btn" title="Create a filter">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Formula Bar -->
+        <div class="formula-bar">
+            <div class="cell-address" id="cell-address">A1</div>
+            <input type="text" class="formula-input" id="formula-input" placeholder="Enter text or formula">
+        </div>
+        
+        <!-- Spreadsheet Container -->
+        <div class="spreadsheet-container" id="spreadsheet-container">
+            <div class="spreadsheet" id="spreadsheet">
+                <!-- Header row will be generated here -->
+                <!-- Rows will be generated here -->
+            </div>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="status-item">Ready</div>
+                <div class="status-item" id="selection-info">1 selected</div>
+            </div>
+            <div class="status-right">
+                <div class="status-item">100%</div>
+                <div class="status-item">10 columns × 150 rows</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <div class="context-menu-item" id="cut-menu">
+            <i class="fas fa-cut"></i> Cut
+        </div>
+        <div class="context-menu-item" id="copy-menu">
+            <i class="fas fa-copy"></i> Copy
+        </div>
+        <div class="context-menu-item" id="paste-menu">
+            <i class="fas fa-paste"></i> Paste
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" id="insert-row-above-menu">
+            <i class="fas fa-arrow-up"></i> Insert row above
+        </div>
+        <div class="context-menu-item" id="insert-row-below-menu">
+            <i class="fas fa-arrow-down"></i> Insert row below
+        </div>
+        <div class="context-menu-item" id="insert-column-left-menu">
+            <i class="fas fa-arrow-left"></i> Insert column left
+        </div>
+        <div class="context-menu-item" id="insert-column-right-menu">
+            <i class="fas fa-arrow-right"></i> Insert column right
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" id="delete-row-menu">
+            <i class="fas fa-trash"></i> Delete row
+        </div>
+        <div class="context-menu-item" id="delete-column-menu">
+            <i class="fas fa-trash"></i> Delete column
+        </div>
+    </div>
+
+    <script>
+        // Spreadsheet state
+        const spreadsheetState = {
+            columns: 10,
+            rows: 150,
+            selectedCell: { row: 0, col: 0 },
+            selectedRange: { start: { row: 0, col: 0 }, end: { row: 0, col: 0 } },
+            isSelecting: false,
+            isEditing: false,
+            clipboard: null,
+            data: {},
+            columnWidths: {},
+            rowHeights: {}
+        };
+
+        // Initialize the spreadsheet
+        function initSpreadsheet() {
+            const spreadsheet = document.getElementById('spreadsheet');
+            
+            // Create header row
+            const headerRow = document.createElement('div');
+            headerRow.className = 'header-row';
+            
+            // Corner cell
+            const cornerCell = document.createElement('div');
+            cornerCell.className = 'corner-cell';
+            headerRow.appendChild(cornerCell);
+            
+            // Column headers
+            for (let i = 0; i < spreadsheetState.columns; i++) {
+                const columnHeader = document.createElement('div');
+                columnHeader.className = 'column-header';
+                columnHeader.textContent = getColumnLabel(i);
+                columnHeader.dataset.col = i;
+                
+                // Add resize handle
+                const resizeHandle = document.createElement('div');
+                resizeHandle.className = 'resize-handle';
+                resizeHandle.addEventListener('mousedown', startColumnResize);
+                columnHeader.appendChild(resizeHandle);
+                
+                // Add click event for column selection
+                columnHeader.addEventListener('click', selectColumn);
+                
+                headerRow.appendChild(columnHeader);
+            }
+            
+            spreadsheet.appendChild(headerRow);
+            
+            // Create rows
+            for (let i = 0; i < spreadsheetState.rows; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                
+                // Row header
+                const rowHeader = document.createElement('div');
+                rowHeader.className = 'row-header';
+                rowHeader.textContent = i + 1;
+                rowHeader.dataset.row = i;
+                
+                // Add click event for row selection
+                rowHeader.addEventListener('click', selectRow);
+                
+                row.appendChild(rowHeader);
+                
+                // Cells
+                for (let j = 0; j < spreadsheetState.columns; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.id = `cell-${i}-${j}`;
+                    
+                    // Add click event for cell selection
+                    cell.addEventListener('click', () => selectCell(i, j));
+                    
+                    // Add double click event for editing
+                    cell.addEventListener('dblclick', () => startEditCell(i, j));
+                    
+                    // Add context menu
+                    cell.addEventListener('contextmenu', showContextMenu);
+                    
+                    // Add mouse events for range selection
+                    cell.addEventListener('mousedown', (e) => {
+                        if (e.button === 0) { // Left click
+                            startRangeSelection(i, j);
+                        }
+                    });
+                    
+                    cell.addEventListener('mouseenter', () => {
+                        if (spreadsheetState.isSelecting) {
+                            updateRangeSelection(i, j);
+                        }
+                    });
+                    
+                    row.appendChild(cell);
+                }
+                
+                spreadsheet.appendChild(row);
+            }
+            
+            // Add global mouse up event to end range selection
+            document.addEventListener('mouseup', endRangeSelection);
+            
+            // Add keyboard navigation
+            document.addEventListener('keydown', handleKeyDown);
+            
+            // Add formula bar input event
+            const formulaInput = document.getElementById('formula-input');
+            formulaInput.addEventListener('input', updateCellFromFormulaBar);
+            formulaInput.addEventListener('keydown', handleFormulaBarKeyDown);
+            
+            // Initialize the first cell as selected
+            selectCell(0, 0);
+        }
+
+        // Get column label (A, B, C, ..., AA, AB, etc.)
+        function getColumnLabel(index) {
+            let label = '';
+            while (index >= 0) {
+                label = String.fromCharCode(65 + (index % 26)) + label;
+                index = Math.floor(index / 26) - 1;
+            }
+            return label;
+        }
+
+        // Select a single cell
+        function selectCell(row, col) {
+            if (spreadsheetState.isEditing) return;
+            
+            // Clear previous selection
+            document.querySelectorAll('.cell.selected').forEach(cell => {
+                cell.classList.remove('selected');
+            });
+            
+            // Set new selection
+            spreadsheetState.selectedCell = { row, col };
+            spreadsheetState.selectedRange = { start: { row, col }, end: { row, col } };
+            
+            // Highlight selected cell
+            const cell = document.getElementById(`cell-${row}-${col}`);
+            if (cell) {
+                cell.classList.add('selected');
+                
+                // Update formula bar
+                updateFormulaBar(row, col);
+                
+                // Update cell address
+                updateCellAddress(row, col);
+                
+                // Update selection info
+                updateSelectionInfo();
+            }
+        }
+
+        // Start range selection
+        function startRangeSelection(row, col) {
+            if (spreadsheetState.isEditing) return;
+            
+            spreadsheetState.isSelecting = true;
+            spreadsheetState.selectedRange = { start: { row, col }, end: { row, col } };
+            selectCell(row, col);
+        }
+
+        // Update range selection
+        function updateRangeSelection(row, col) {
+            if (!spreadsheetState.isSelecting) return;
+            
+            // Clear previous selection
+            document.querySelectorAll('.cell.selected').forEach(cell => {
+                cell.classList.remove('selected');
+            });
+            
+            // Update range
+            spreadsheetState.selectedRange.end = { row, col };
+            
+            // Get range boundaries
+            const minRow = Math.min(spreadsheetState.selectedRange.start.row, row);
+            const maxRow = Math.max(spreadsheetState.selectedRange.start.row, row);
+            const minCol = Math.min(spreadsheetState.selectedRange.start.col, col);
+            const maxCol = Math.max(spreadsheetState.selectedRange.start.col, col);
+            
+            // Highlight all cells in range
+            for (let i = minRow; i <= maxRow; i++) {
+                for (let j = minCol; j <= maxCol; j++) {
+                    const cell = document.getElementById(`cell-${i}-${j}`);
+                    if (cell) {
+                        cell.classList.add('selected');
+                    }
+                }
+            }
+            
+            // Update formula bar with the first cell in range
+            updateFormulaBar(minRow, minCol);
+            updateCellAddress(minRow, minCol);
+            
+            // Update selection info
+            updateSelectionInfo();
+        }
+
+        // End range selection
+        function endRangeSelection() {
+            spreadsheetState.isSelecting = false;
+        }
+
+        // Select a column
+        function selectColumn(e) {
+            if (spreadsheetState.isEditing) return;
+            
+            const col = parseInt(e.target.dataset.col);
+            
+            // Clear previous selection
+            document.querySelectorAll('.cell.selected, .column-header.selected, .row-header.selected').forEach(element => {
+                element.classList.remove('selected');
+            });
+            
+            // Highlight column header
+            e.target.classList.add('selected');
+            
+            // Highlight all cells in column
+            for (let i = 0; i < spreadsheetState.rows; i++) {
+                const cell = document.getElementById(`cell-${i}-${col}`);
+                if (cell) {
+                    cell.classList.add('selected');
+                }
+            }
+            
+            // Update range
+            spreadsheetState.selectedRange = { start: { row: 0, col }, end: { row: spreadsheetState.rows - 1, col } };
+            
+            // Update selection info
+            updateSelectionInfo();
+        }
+
+        // Select a row
+        function selectRow(e) {
+            if (spreadsheetState.isEditing) return;
+            
+            const row = parseInt(e.target.dataset.row);
+            
+            // Clear previous selection
+            document.querySelectorAll('.cell.selected, .column-header.selected, .row-header.selected').forEach(element => {
+                element.classList.remove('selected');
+            });
+            
+            // Highlight row header
+            e.target.classList.add('selected');
+            
+            // Highlight all cells in row
+            for (let i = 0; i < spreadsheetState.columns; i++) {
+                const cell = document.getElementById(`cell-${row}-${i}`);
+                if (cell) {
+                    cell.classList.add('selected');
+                }
+            }
+            
+            // Update range
+            spreadsheetState.selectedRange = { start: { row, col: 0 }, end: { row, col: spreadsheetState.columns - 1 } };
+            
+            // Update selection info
+            updateSelectionInfo();
+        }
+
+        // Start editing a cell
+        function startEditCell(row, col) {
+            if (spreadsheetState.isEditing) return;
+            
+            spreadsheetState.isEditing = true;
+            const cell = document.getElementById(`cell-${row}-${col}`);
+            
+            // Get current value
+            const currentValue = getCellValue(row, col);
+            
+            // Create input element
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'cell-input';
+            input.value = currentValue;
+            
+            // Clear cell and add input
+            cell.innerHTML = '';
+            cell.appendChild(input);
+            cell.classList.add('editing');
+            
+            // Focus input
+            input.focus();
+            input.select();
+            
+            // Add event listeners
+            input.addEventListener('blur', () => finishEditCell(row, col, input.value));
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    finishEditCell(row, col, input.value);
+                    // Move to next row
+                    if (row < spreadsheetState.rows - 1) {
+                        selectCell(row + 1, col);
+                    }
+                } else if (e.key === 'Escape') {
+                    finishEditCell(row, col, currentValue);
+                }
+            });
+        }
+
+        // Finish editing a cell
+        function finishEditCell(row, col, value) {
+            spreadsheetState.isEditing = false;
+            
+            // Save value
+            setCellValue(row, col, value);
+            
+            // Update cell display
+            const cell = document.getElementById(`cell-${row}-${col}`);
+            cell.innerHTML = value;
+            cell.classList.remove('editing');
+            
+            // Update formula bar
+            updateFormulaBar(row, col);
+        }
+
+        // Update formula bar with cell value
+        function updateFormulaBar(row, col) {
+            const formulaInput = document.getElementById('formula-input');
+            const value = getCellValue(row, col);
+            formulaInput.value = value;
+        }
+
+        // Update cell address display
+        function updateCellAddress(row, col) {
+            const cellAddress = document.getElementById('cell-address');
+            cellAddress.textContent = `${getColumnLabel(col)}${row + 1}`;
+        }
+
+        // Update selection info
+        function updateSelectionInfo() {
+            const selectionInfo = document.getElementById('selection-info');
+            
+            const minRow = Math.min(spreadsheetState.selectedRange.start.row, spreadsheetState.selectedRange.end.row);
+            const maxRow = Math.max(spreadsheetState.selectedRange.start.row, spreadsheetState.selectedRange.end.row);
+            const minCol = Math.min(spreadsheetState.selectedRange.start.col, spreadsheetState.selectedRange.end.col);
+            const maxCol = Math.max(spreadsheetState.selectedRange.start.col, spreadsheetState.selectedRange.end.col);
+            
+            const rowCount = maxRow - minRow + 1;
+            const colCount = maxCol - minCol + 1;
+            const totalCells = rowCount * colCount;
+            
+            if (totalCells === 1) {
+                selectionInfo.textContent = `${getColumnLabel(minCol)}${minRow + 1} selected`;
+            } else {
+                selectionInfo.textContent = `${totalCells} cells selected`;
+            }
+        }
+
+        // Get cell value
+        function getCellValue(row, col) {
+            const key = `${row}-${col}`;
+            return spreadsheetState.data[key] || '';
+        }
+
+        // Set cell value
+        function setCellValue(row, col, value) {
+            const key = `${row}-${col}`;
+            if (value) {
+                spreadsheetState.data[key] = value;
+            } else {
+                delete spreadsheetState.data[key];
+            }
+        }
+
+        // Update cell from formula bar
+        function updateCellFromFormulaBar() {
+            if (spreadsheetState.isEditing) return;
+            
+            const formulaInput = document.getElementById('formula-input');
+            const { row, col } = spreadsheetState.selectedCell;
+            
+            // Update cell value
+            setCellValue(row, col, formulaInput.value);
+            
+            // Update cell display
+            const cell = document.getElementById(`cell-${row}-${col}`);
+            cell.textContent = formulaInput.value;
+        }
+
+        // Handle keyboard navigation
+        function handleKeyDown(e) {
+            if (spreadsheetState.isEditing) return;
+            
+            const { row, col } = spreadsheetState.selectedCell;
+            let newRow = row;
+            let newCol = col;
+            
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (row > 0) newRow = row - 1;
+                    break;
+                case 'ArrowDown':
+                    if (row < spreadsheetState.rows - 1) newRow = row + 1;
+                    break;
+                case 'ArrowLeft':
+                    if (col > 0) newCol = col - 1;
+                    break;
+                case 'ArrowRight':
+                    if (col < spreadsheetState.columns - 1) newCol = col + 1;
+                    break;
+                case 'Enter':
+                    if (row < spreadsheetState.rows - 1) newRow = row + 1;
+                    break;
+                case 'Tab':
+                    if (col < spreadsheetState.columns - 1) newCol = col + 1;
+                    e.preventDefault(); // Prevent default tab behavior
+                    break;
+                case 'Delete':
+                case 'Backspace':
+                    // Clear selected cells
+                    clearSelectedCells();
+                    e.preventDefault();
+                    return;
+                case 'F2':
+                    startEditCell(row, col);
+                    e.preventDefault();
+                    return;
+                case 'c':
+                    if (e.ctrlKey || e.metaKey) {
+                        copySelectedCells();
+                        e.preventDefault();
+                        return;
+                    }
+                    break;
+                case 'v':
+                    if (e.ctrlKey || e.metaKey) {
+                        pasteToSelectedCells();
+                        e.preventDefault();
+                        return;
+                    }
+                    break;
+                case 'x':
+                    if (e.ctrlKey || e.metaKey) {
+                        cutSelectedCells();
+                        e.preventDefault();
+                        return;
+                    }
+                    break;
+                case 'z':
+                    if (e.ctrlKey || e.metaKey) {
+                        // Undo functionality would go here
+                        e.preventDefault();
+                        return;
+                    }
+                    break;
+                case 'y':
+                    if (e.ctrlKey || e.metaKey) {
+                        // Redo functionality would go here
+                        e.preventDefault();
+                        return;
+                    }
+                    break;
+                default:
+                    // Start editing if a letter, number, or special character is pressed
+                    if (e.key.length === 1) {
+                        startEditCell(row, col);
+                        const cell = document.getElementById(`cell-${row}-${col}`);
+                        const input = cell.querySelector('.cell-input');
+                        if (input) {
+                            input.value = e.key;
+                        }
+                        return;
+                    }
+                    break;
+            }
+            
+            if (newRow !== row || newCol !== col) {
+                selectCell(newRow, newCol);
+                e.preventDefault();
+            }
+        }
+
+        // Handle formula bar keyboard events
+        function handleFormulaBarKeyDown(e) {
+            if (e.key === 'Enter') {
+                updateCellFromFormulaBar();
+                // Move to next row
+                const { row } = spreadsheetState.selectedCell;
+                if (row < spreadsheetState.rows - 1) {
+                    selectCell(row + 1, spreadsheetState.selectedCell.col);
+                }
+            }
+        }
+
+        // Clear selected cells
+        function clearSelectedCells() {
+            const minRow = Math.min(spreadsheetState.selectedRange.start.row, spreadsheetState.selectedRange.end.row);
+            const maxRow = Math.max(spreadsheetState.selectedRange.start.row, spreadsheetState.selectedRange.end.row);
+            const minCol = Math.min(spreadsheetState.selectedRange.start.col, spreadsheetState.selectedRange.end.col);
+            const maxCol = Math.max(spreadsheetState.selectedRange.start.col, spreadsheetState.selectedRange.end.col);
+            
+            for (let i = minRow; i <= maxRow; i++) {
+                for (let j = minCol; j <= maxCol; j++) {
+                    setCellValue(i, j, '');
+                    const cell = document.getElementById(`cell-${i}-${j}`);
+                    cell.textContent = '';
+                }
+            }
+            
+            updateFormulaBar(minRow, minCol);
+        }
+
+        // Copy selected cells
+        function copySelectedCells() {
+            const minRow = Math.min(spreadsheetState.selectedRange.start.row, spreadsheetState.selectedRange.end.row);
+            const maxRow = Math.max(spreadsheetState.selectedRange.start.row, spreadsheetState.selectedRange.end.row);
+            const minCol = Math.min(spreadsheetState.selectedRange.start.col, spreadsheetState.selectedRange.end.col);
+            const maxCol = Math.max(spreadsheetState.selectedRange.start.col, spreadsheetState.selectedRange.end.col);
+            
+            const copiedData = [];
+            
+            for (let i = minRow; i <= maxRow; i++) {
+                const rowData = [];
+                for (let j = minCol; j <= maxCol; j++) {
+                    rowData.push(getCellValue(i, j));
+                }
+                copiedData.push(rowData);
+            }
+            
+            spreadsheetState.clipboard = {
+                data: copiedData,
+                rows: maxRow - minRow + 1,
+                cols: maxCol - minCol + 1
+            };
+        }
+
+        // Cut selected cells
+        function cutSelectedCells() {
+            copySelectedCells();
+            clearSelectedCells();
+        }
+
+        // Paste to selected cells
+        function pasteToSelectedCells() {
+            if (!spreadsheetState.clipboard) return;
+            
+            const { data, rows, cols } = spreadsheetState.clipboard;
+            const { row: startRow, col: startCol } = spreadsheetState.selectedCell;
+            
+            for (let i = 0; i < rows && startRow + i < spreadsheetState.rows; i++) {
+                for (let j = 0; j < cols && startCol + j < spreadsheetState.columns; j++) {
+                    const value = data[i][j];
+                    setCellValue(startRow + i, startCol + j, value);
+                    const cell = document.getElementById(`cell-${startRow + i}-${startCol + j}`);
+                    cell.textContent = value;
+                }
+            }
+            
+            updateFormulaBar(startRow, startCol);
+        }
+
+        // Show context menu
+        function showContextMenu(e) {
+            e.preventDefault();
+            
+            const contextMenu = document.getElementById('context-menu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = `${e.pageX}px`;
+            contextMenu.style.top = `${e.pageY}px`;
+            
+            // Hide context menu when clicking elsewhere
+            document.addEventListener('click', hideContextMenu);
+        }
+
+        // Hide context menu
+        function hideContextMenu() {
+            const contextMenu = document.getElementById('context-menu');
+            contextMenu.style.display = 'none';
+            document.removeEventListener('click', hideContextMenu);
+        }
+
+        // Start column resize
+        function startColumnResize(e) {
+            e.stopPropagation();
+            
+            const columnHeader = e.target.parentElement;
+            const col = parseInt(columnHeader.dataset.col);
+            const startX = e.pageX;
+            const startWidth = columnHeader.offsetWidth;
+            
+            function doDrag(e) {
+                const newWidth = startWidth + e.pageX - startX;
+                if (newWidth > 50) { // Minimum width
+                    spreadsheetState.columnWidths[col] = newWidth;
+                    
+                    // Update column header width
+                    columnHeader.style.width = `${newWidth}px`;
+                    columnHeader.style.minWidth = `${newWidth}px`;
+                    
+                    // Update all cells in this column
+                    for (let i = 0; i < spreadsheetState.rows; i++) {
+                        const cell = document.getElementById(`cell-${i}-${col}`);
+                        if (cell) {
+                            cell.style.width = `${newWidth}px`;
+                            cell.style.minWidth = `${newWidth}px`;
+                        }
+                    }
+                }
+            }
+            
+            function stopDrag() {
+                document.removeEventListener('mousemove', doDrag);
+                document.removeEventListener('mouseup', stopDrag);
+            }
+            
+            document.addEventListener('mousemove', doDrag);
+            document.addEventListener('mouseup', stopDrag);
+        }
+
+        // Initialize context menu actions
+        function initContextMenuActions() {
+            document.getElementById('cut-menu').addEventListener('click', () => {
+                cutSelectedCells();
+                hideContextMenu();
+            });
+            
+            document.getElementById('copy-menu').addEventListener('click', () => {
+                copySelectedCells();
+                hideContextMenu();
+            });
+            
+            document.getElementById('paste-menu').addEventListener('click', () => {
+                pasteToSelectedCells();
+                hideContextMenu();
+            });
+            
+            document.getElementById('insert-row-above-menu').addEventListener('click', () => {
+                // Implementation would go here
+                hideContextMenu();
+            });
+            
+            document.getElementById('insert-row-below-menu').addEventListener('click', () => {
+                // Implementation would go here
+                hideContextMenu();
+            });
+            
+            document.getElementById('insert-column-left-menu').addEventListener('click', () => {
+                // Implementation would go here
+                hideContextMenu();
+            });
+            
+            document.getElementById('insert-column-right-menu').addEventListener('click', () => {
+                // Implementation would go here
+                hideContextMenu();
+            });
+            
+            document.getElementById('delete-row-menu').addEventListener('click', () => {
+                // Implementation would go here
+                hideContextMenu();
+            });
+            
+            document.getElementById('delete-column-menu').addEventListener('click', () => {
+                // Implementation would go here
+                hideContextMenu();
+            });
+        }
+
+        // Initialize toolbar actions
+        function initToolbarActions() {
+            // Add event listeners for toolbar buttons
+            document.getElementById('undo-btn').addEventListener('click', () => {
+                // Implementation would go here
+            });
+            
+            document.getElementById('redo-btn').addEventListener('click', () => {
+                // Implementation would go here
+            });
+            
+            document.getElementById('print-btn').addEventListener('click', () => {
+                window.print();
+            });
+            
+            document.getElementById('bold-btn').addEventListener('click', () => {
+                // Implementation would go here
+            });
+            
+            document.getElementById('italic-btn').addEventListener('click', () => {
+                // Implementation would go here
+            });
+            
+            document.getElementById('underline-btn').addEventListener('click', () => {
+                // Implementation would go here
+            });
+            
+            // Add more toolbar button actions as needed
+        }
+
+        // Initialize the spreadsheet when the DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initSpreadsheet();
+            initContextMenuActions();
+            initToolbarActions();
+        });
+    </script>
+</body>
+</html>
